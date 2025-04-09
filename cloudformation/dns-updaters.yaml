@@ -33,14 +33,14 @@ Resources:
                 Action:
                   - route53:GetHostedZone
                 Resource: '*'
-                
+
               - Effect: Allow
                 Action: route53:ChangeResourceRecordSets
                 Resource: !Sub arn:aws:route53:::hostedzone/${HostedZoneId}
                 Condition:
                   StringLike:
                     "route53:ChangeResourceRecordSetsNormalizedRecordNames":
-                      - !Sub "MahicneName.${SecondLevelDomainName}"
+                      - !Sub "${MahicneName}.${SecondLevelDomainName}"
                     "route53:ChangeResourceRecordSetsActions":
                       - CREATE
                       - UPSERT
