@@ -1,12 +1,6 @@
 name: DeployStaticPage
 
 on:
-  workflow_dispatch:
-    inputs:
-      MachineNameList:
-        description: 'List of machine names to deploy for (comma separated, e.g., home1,machine2)'
-        required: true
-        default: home
   push:
     branches:
       - main
@@ -34,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        machine-name: ${{ fromJson('[' + github.event.inputs.MachineNameList + ']') }}
+        machine-name: [home] # You can add more machine names here, e.g., [home1, home2, machine3, machine4]
 
     steps:
       - name: Checkout
