@@ -21,9 +21,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Lint CloudFormation template
+      - name: Install cfn-lint
         run: |
           pip install cfn-lint
+
+      - name: Lint CloudFormation template
+        run: |
           cfn-lint cloudformation/dns-updaters.yaml
 
   deploy:
