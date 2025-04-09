@@ -14,9 +14,8 @@ on:
       - '.github/workflows/deploy-dns-updaters.yaml'
       - 'cloudformation/dns-updaters.yaml'
 
-jobs:      
-
-  deploy:
+jobs:
+  lint:
     name: cfnLint
     runs-on: ubuntu-latest
     steps:
