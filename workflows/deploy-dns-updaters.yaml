@@ -59,4 +59,3 @@ jobs:
           parameter-overrides: >
             MahicneName=${{ matrix.machine-name }}
           capabilities: CAPABILITY_NAMED_IAM
-
