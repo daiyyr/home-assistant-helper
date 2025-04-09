@@ -1,0 +1,62 @@
+name: DeployStaticPage
+
+on:
+  workflow_dispatch:
+    inputs:
+      MachineNameList:
+        description: 'List of machine names to deploy for (comma separated, e.g., home1,machine2)'
+        required: true
+        default: home
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/deploy-dns-updaters.yaml'
+      - 'cloudformation/dns-updaters.yaml'
+
+jobs:      
+
+  deploy:
+    name: cfnLint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Lint CloudFormation template
+        run: |
+          pip install cfn-lint
+          cfn-lint cloudformation/dns-updaters.yaml
+
+  deploy:
+    name: DeployCloudformation
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        machine-name: ${{ fromJson('[' + github.event.inputs.MachineNameList + ']') }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Configure AWS credentials
+        id: creds
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_TEEMO1DAI }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_TEEMO1DAI }}
+          aws-region: ap-southeast-2
+      
+      - name: DeployCFNStack
+        id: dns-updaters
+        uses: aws-actions/aws-cloudformation-github-deploy@master
+        with:
+          name: dns-updater-${{ matrix.machine-name }}
+          template: cloudformation/dns-updaters.yaml
+          no-fail-on-empty-changeset: "1"
+          parameter-overrides: >
+            MahicneName=${{ matrix.machine-name }}
+          capabilities: CAPABILITY_NAMED_IAM
+

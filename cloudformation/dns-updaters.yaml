@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: IAM User with scoped permissions for Route 53 DNS updates
+
+Metadata:
+  Author:
+    - Teemo Dai
+
+Parameters:
+  MahicneName:
+    Type: String
+    Description: Name of the machine to create the IAM user for
+  HostedZoneId:
+    Type: String
+    Description: Route 53 Hosted Zone ID
+    Default: Z06958611JDYVCG41K93R
+  SecondLevelDomainName:
+    Type: String
+    Description: SLD, the domain name you registered (e.g., "example" in "example.com")
+    Default: the-alchemist.link
+
+Resources:
+  ScopedUser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Sub "${MahicneName}-dns-updater-user"
+      Policies:
+        - PolicyName: ScopedDNSUpdatePolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - route53:GetHostedZone
+                Resource: '*'
+                
+              - Effect: Allow
+                Action: route53:ChangeResourceRecordSets
+                Resource: !Sub arn:aws:route53:::hostedzone/${HostedZoneId}
+                Condition:
+                  StringLike:
+                    "route53:ChangeResourceRecordSetsNormalizedRecordNames":
+                      - !Sub "MahicneName.${SecondLevelDomainName}"
+                    "route53:ChangeResourceRecordSetsActions":
+                      - CREATE
+                      - UPSERT
