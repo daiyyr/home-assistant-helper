@@ -1,8 +1,7 @@
 #!/bin/bash
 
-# update MachineNickName for each machine
 R53HostedZoneId="Z06958611JDYVCG41K93R"
-MachineNickName="home"
+MachineNickName=`cat /homeassistant/machine_nickname.txt`
 
 IP_FILE="/homeassistant/previous-ip.txt"
 mkdir -p "$(dirname "$IP_FILE")"
