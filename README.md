@@ -11,7 +11,7 @@ Regularly update R53 records to point to local machine(s) public IP. Each machin
 cd /homeassistant
 clone https://github.com/daiyyr/granular-dynamic-dns
 chmod 775 /homeassistant/granular-dynamic-dns/scripts/update-dns.sh
-apk add aws-cli
+apk add aws-cli cronie openrc
 aws configure
 # enter AWS Secret Access Key and AWS Access Key ID from last step
 ```
@@ -20,7 +20,9 @@ aws configure
 
 ```
 crontab -e
-
 # add the below line
 * * * * * /homeassistant/granular-dynamic-dns/scripts/update-dns.sh >> /homeassistant/granular-dynamic-dns/update-dns.log 2>&1
+
+# run crond incase it's not already running - # it should already run when we did apk add cronie openrc
+crond -s
 ```
