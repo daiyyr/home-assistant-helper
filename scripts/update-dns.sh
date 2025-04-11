@@ -18,7 +18,7 @@ fi
 PUBLIC_IP=$(curl -s https://checkip.amazonaws.com)
 
 if [ "$PUBLIC_IP" != "$PREVIOUS_IP" ]; then
-  echo "Public IP has changed. Updating Route 53 record..."
+  echo "`date +%Y%m%d_%H%M%S%Z` Public IP has changed to $PUBLIC_IP. Updating Route 53 record..."
     
     # if R53HostedZoneId exists, update Route 53 record
     if [ -z "$R53HostedZoneId" ]; then
@@ -33,5 +33,5 @@ if [ "$PUBLIC_IP" != "$PREVIOUS_IP" ]; then
   echo $PUBLIC_IP > "$IP_FILE"
 
 else
-  echo "Public IP has not changed."
+  echo "`date +%Y%m%d_%H%M%S%Z` ip not changed"
 fi

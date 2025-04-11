@@ -11,6 +11,7 @@ Regularly update R53 records to point to local machine(s) public IP. Each machin
 cd /homeassistant
 clone https://github.com/daiyyr/granular-dynamic-dns
 apk add aws-cli cronie openrc
+mkdir /root/.cache
 aws configure
 # enter AWS Secret Access Key and AWS Access Key ID from last step
 ```
