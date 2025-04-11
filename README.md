@@ -38,6 +38,11 @@ crontab -e
 
 # Check and push Home Assistance config yaml files to github every 3 minutes
 ```
+git config --global credential.helper store
+cd /homeassistant
+git clone https://github.com/daiyyr/home-assistant-config
+# enter the fine-grained PAT for this repo
+
 crontab -e
 # add the below line
 */3 * * * * /homeassistant/granular-dynamic-dns/scripts/push-to-github.sh >/dev/null 2>&1
