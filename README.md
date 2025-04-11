@@ -40,5 +40,5 @@ crontab -e
 ```
 crontab -e
 # add the below line
-*/3 * * * * /homeassistant/granular-dynamic-dns/scripts/push-to-github.sh >> /homeassistant/logs/github-push.log >/dev/null 2>&1
+*/3 * * * * /homeassistant/granular-dynamic-dns/scripts/push-to-github.sh >/dev/null 2>&1
 ```
