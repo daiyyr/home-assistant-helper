@@ -2,6 +2,7 @@
 
 # # This script is used to push the home assistant config files to github
 MachineNickName=`cat /homeassistant/machine_nickname.txt`
+mkdir -p /homeassistant/home-assistant-config/$MachineNickName
 cd /homeassistant/home-assistant-config
 cp ../*.yaml ./$MachineNickName/
 
