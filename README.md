@@ -21,7 +21,7 @@ aws configure
 ```
 crontab -e
 # add the below line
-* * * * * /homeassistant/granular-dynamic-dns/scripts/update-dns.sh >> /homeassistant/granular-dynamic-dns/update-dns.log 2>&1
+*/5 * * * * /homeassistant/granular-dynamic-dns/scripts/update-dns.sh >> /homeassistant/granular-dynamic-dns/update-dns.log 2>&1
 
 # run crond incase it's not already running - # it should already run when we did apk add cronie openrc
 crond -s

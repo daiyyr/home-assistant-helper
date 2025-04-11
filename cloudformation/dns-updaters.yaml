@@ -44,3 +44,15 @@ Resources:
                     "route53:ChangeResourceRecordSetsActions":
                       - CREATE
                       - UPSERT
+
+              # below is not required for dns-updater. it's only for my homeAssistant backup
+              - Effect: Allow
+                Action:
+                  - s3:ListBucket
+                Resource: arn:aws:s3:::home-assistant
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:DeleteObject
+                Resource: arn:aws:s3:::home-assistant/${MahicneName}/backup/*
