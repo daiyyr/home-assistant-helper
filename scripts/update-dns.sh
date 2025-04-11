@@ -33,5 +33,5 @@ if [ "$PUBLIC_IP" != "$PREVIOUS_IP" ]; then
   echo $PUBLIC_IP > "$IP_FILE"
 
 else
-  echo "`date +%Y%m%d_%H%M%S%Z` ip not changed"
+  echo "`date +%Y%m%d_%H%M%S%Z`: ip not changed"
 fi
