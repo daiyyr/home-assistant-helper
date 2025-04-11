@@ -8,8 +8,9 @@ Regularly update R53 records to point to local machine(s) public IP. Each machin
 - SSH to the new machine, install aws cli and configure AWS CLI with the above AWS credentials. Depending on the OS, you may need to use the relevant package manager to install the AWS CLI. Home Assistant Operating System for Raspberry Pi is based on Alpine Linux, so we use apk:
 
 ```
-cd /opt
+cd /homeassistant
 clone https://github.com/daiyyr/granular-dynamic-dns
+chmod 775 /homeassistant/granular-dynamic-dns/scripts/update-dns.sh
 apk add aws-cli
 aws configure
 # enter AWS Secret Access Key and AWS Access Key ID from last step
@@ -21,5 +22,5 @@ aws configure
 crontab -e
 
 # add the below line
-* * * * * /opt/granular-dynamic-dns/scripts/update-dns.sh >> /opt/granular-dynamic-dns/update-dns.log 2>&1
+* * * * * /homeassistant/granular-dynamic-dns/scripts/update-dns.sh >> /homeassistant/granular-dynamic-dns/update-dns.log 2>&1
 ```

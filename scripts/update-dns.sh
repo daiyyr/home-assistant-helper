@@ -4,7 +4,7 @@
 R53HostedZoneId="Z06958611JDYVCG41K93R"
 MachineNickName="home"
 
-IP_FILE="/opt/granular-dynamic-dns/previous-ip.txt"
+IP_FILE="/homeassistant/granular-dynamic-dns/previous-ip.txt"
 mkdir -p "$(dirname "$IP_FILE")"
 
 # Read the previous IP from the file
