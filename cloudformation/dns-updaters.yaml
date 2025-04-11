@@ -55,4 +55,4 @@ Resources:
                   - s3:GetObject
                   - s3:PutObject
                   - s3:DeleteObject
-                Resource: arn:aws:s3:::the-alchemist-home-assistant/${MahicneName}/backup/*
+                Resource: !Sub arn:aws:s3:::the-alchemist-home-assistant/${MahicneName}/backup/*
