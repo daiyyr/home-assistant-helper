@@ -49,10 +49,10 @@ Resources:
               - Effect: Allow
                 Action:
                   - s3:ListBucket
-                Resource: arn:aws:s3:::home-assistant
+                Resource: arn:aws:s3:::the-alchemist-home-assistant
               - Effect: Allow
                 Action:
                   - s3:GetObject
                   - s3:PutObject
                   - s3:DeleteObject
-                Resource: arn:aws:s3:::home-assistant/${MahicneName}/backup/*
+                Resource: arn:aws:s3:::the-alchemist-home-assistant/${MahicneName}/backup/*
