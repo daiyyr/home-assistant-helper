@@ -9,6 +9,7 @@ Regularly update R53 records to point to local machine(s) public IP. Each machin
 
 ```
 machine_nickname="home" # update this value for each machine
+
 echo "$machine_nickname" > /homeassistant/machine_nickname.txt
 cd /homeassistant
 clone https://github.com/daiyyr/granular-dynamic-dns
@@ -17,11 +18,7 @@ mkdir /root/.cache
 mkdir -p /homeassistant/logs
 aws configure
 # enter AWS Secret Access Key and AWS Access Key ID from last step
-```
 
-- add a crontab record for dynamic dns:
-
-```
 chmod 775 /homeassistant/granular-dynamic-dns/scripts/update-dns.sh
 crontab -e
 # add the below line
