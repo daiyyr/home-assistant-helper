@@ -1,6 +1,7 @@
-# home-assistant-helper
-Regularly update R53 records to point to local machine(s) public IP. Each machine use a different AWS user which can only update a specific DNS
-
+# Introduction
+- Regularly update R53 records to point to local machine public IP. Each machine use a different AWS user which can only update a specific DNS
+- Regularly upload Home Assistant backup files to s3
+- Regularly push Home Assistant config yaml files to github
 
 # New machine setup
 - Update workflows/deploy-dns-updaters.yaml, add a new machine nick name to deploy.strategy.matrix.machine-name, e.g. home1,machine2,machine3,newmachine4. The Github workflow should be triggered to create a new aws user with policies to update the specific dns
@@ -29,14 +30,14 @@ crond -s
 ```
 
 
-# Upload Home Assistance backup files to s3 at 03:00 on Sunday
+# Upload Home Assistant backup files to s3 at 03:00 on Sunday
 ```
 crontab -e
 # add the below line
 0 3 * * 0 /homeassistant/home-assistant-helper/scripts/backup-to-s3.sh >> /homeassistant/logs/s3-backup.log 2>&1
 ```
 
-# Check and push Home Assistance config yaml files to github every 3 minutes
+# Check and push Home Assistant config yaml files to github every 3 minutes
 ```
 git config --global credential.helper store
 cd /homeassistant
