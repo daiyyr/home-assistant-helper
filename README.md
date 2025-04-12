@@ -1,4 +1,4 @@
-# granular-dynamic-dns
+# home-assistant-helper
 Regularly update R53 records to point to local machine(s) public IP. Each machine use a different AWS user which can only update a specific DNS
 
 
@@ -12,17 +12,17 @@ machine_nickname="home" # update this value for each machine
 
 echo "$machine_nickname" > /homeassistant/machine_nickname.txt
 cd /homeassistant
-clone https://github.com/daiyyr/granular-dynamic-dns
+clone https://github.com/daiyyr/home-assistant-helper
 apk add aws-cli cronie openrc
 mkdir /root/.cache
 mkdir -p /homeassistant/logs
 aws configure
 # enter AWS Secret Access Key and AWS Access Key ID from last step
 
-chmod 775 /homeassistant/granular-dynamic-dns/scripts/update-dns.sh
+chmod 775 /homeassistant/home-assistant-helper/scripts/update-dns.sh
 crontab -e
 # add the below line
-*/5 * * * * /homeassistant/granular-dynamic-dns/scripts/update-dns.sh >> /homeassistant/logs/update-dns.log 2>&1
+*/5 * * * * /homeassistant/home-assistant-helper/scripts/update-dns.sh >> /homeassistant/logs/update-dns.log 2>&1
 
 # run crond incase it's not already running - # it should already run when we did apk add cronie openrc
 crond -s
@@ -33,7 +33,7 @@ crond -s
 ```
 crontab -e
 # add the below line
-0 3 * * 0 /homeassistant/granular-dynamic-dns/scripts/backup-to-s3.sh >> /homeassistant/logs/s3-backup.log 2>&1
+0 3 * * 0 /homeassistant/home-assistant-helper/scripts/backup-to-s3.sh >> /homeassistant/logs/s3-backup.log 2>&1
 ```
 
 # Check and push Home Assistance config yaml files to github every 3 minutes
@@ -45,5 +45,5 @@ git clone https://github.com/daiyyr/home-assistant-config
 
 crontab -e
 # add the below line
-*/3 * * * * /homeassistant/granular-dynamic-dns/scripts/push-to-github.sh >/dev/null 2>&1
+*/3 * * * * /homeassistant/home-assistant-helper/scripts/push-to-github.sh >/dev/null 2>&1
 ```
