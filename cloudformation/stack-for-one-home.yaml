@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
-Description: One IAM user for the home-assistant-helper docker and one IAM user for the home-assistant-helper host
+Description: CFN stack to create IAM users for the docker and host machine, and an ECR repository for the docker image.
 
 Metadata:
   Author:
@@ -21,7 +21,7 @@ Parameters:
 
 Resources:
 
-  # for the docker to update R53 records and S3
+  # IAM user for the docker to update R53 records and S3
   DockerUser:
     Type: AWS::IAM::User
     Properties:
@@ -58,7 +58,7 @@ Resources:
                   - s3:DeleteObject
                 Resource: !Sub arn:aws:s3:::the-alchemist-home-assistant/${MachineNickName}/backup/*
 
-  # for the host to fetch the docker image from ECR
+  # IAM user for the host to fetch the docker image from ECR
   HostUser:
     Type: AWS::IAM::User
     Properties:
@@ -81,3 +81,9 @@ Resources:
                   - ecr:GetDownloadUrlForLayer
                   - ecr:BatchGetImage
                 Resource: arn:aws:ecr:ap-southeast-2:654654455942:repository/home-assistant-helper-${MachineNickName}
+
+  # ECR repository for the docker image
+  ECRRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Sub "home-assistant-helper-${MachineNickName}"
