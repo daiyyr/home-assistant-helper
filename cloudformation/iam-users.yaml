@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
-Description: IAM User with scoped permissions for Route 53 DNS updates
+Description: One IAM user for the home-assistant-helper docker and one IAM user for the home-assistant-helper host
 
 Metadata:
   Author:
@@ -20,12 +20,14 @@ Parameters:
     Default: the-alchemist.link
 
 Resources:
-  ScopedUser:
+
+  # for the docker to update R53 records and S3
+  DockerUser:
     Type: AWS::IAM::User
     Properties:
-      UserName: !Sub "${MahicneName}-dns-updater-user"
+      UserName: !Sub "${MahicneName}-docker-user"
       Policies:
-        - PolicyName: ScopedDNSUpdatePolicy
+        - PolicyName: AllowUpdateR53andS3
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -45,7 +47,6 @@ Resources:
                       - CREATE
                       - UPSERT
 
-              # below is not required for dns-updater. it's only for my homeAssistant backup
               - Effect: Allow
                 Action:
                   - s3:ListBucket
@@ -56,3 +57,27 @@ Resources:
                   - s3:PutObject
                   - s3:DeleteObject
                 Resource: !Sub arn:aws:s3:::the-alchemist-home-assistant/${MahicneName}/backup/*
+
+  # for the host to fetch the docker image from ECR
+  HostUser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Sub "${MahicneName}-host-user"
+      Policies:
+        - PolicyName: AllowFetchECRImage${MahicneName}
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: ECRAuthToken
+                Effect: Allow
+                Action:
+                  - ecr:GetAuthorizationToken
+                Resource: "*"
+
+              - Sid: AllowPullFromSpecificRepo
+                Effect: Allow
+                Action:
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:GetDownloadUrlForLayer
+                  - ecr:BatchGetImage
+                Resource: arn:aws:ecr:ap-southeast-2:654654455942:repository/home-assistant-helper-${MahicneName}

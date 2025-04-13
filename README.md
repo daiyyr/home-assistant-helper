@@ -4,9 +4,23 @@
 - Regularly push Home Assistant config yaml files to github
 
 # New machine setup
-- Update workflows/deploy-dns-updaters.yaml, add a new machine nick name to deploy.strategy.matrix.machine-name, e.g. home1,machine2,machine3,newmachine4. The Github workflow should be triggered to create a new aws user with policies to update the specific dns
-- Go to aws console to get AWS Secret Access Key and AWS Access Key ID for that user
+- Update workflows/ci-pipeline.yaml, add a new machine nick name to deploy.strategy.matrix.machine-name, e.g. home1,machine2,machine3,newmachine4. Push the change to main branch and the Github workflow should be triggered to create two IAM users - one for the docker container, oen for the host. The workflow will then build a docker image with the docker IAM user and push the image to ECR.
+- Go to aws console to get AWS Secret Access Key and AWS Access Key ID from the <strong>host</strong> user.
 - SSH to the new machine, install aws cli and configure AWS CLI with the above AWS credentials. Depending on the OS, you may need to use the relevant package manager to install the AWS CLI. Home Assistant Operating System for Raspberry Pi is based on Alpine Linux, so we use apk:
+```
+apk add aws-cli
+aws configure
+# enter AWS Secret Access Key and AWS Access Key ID from last step
+```
+- Run the home-assistant-helper docker container
+```
+TODO
+```
+
+
+
+
+# below are old readme. need delete later
 
 ```
 machine_nickname="home" # update this value for each machine
