@@ -4,7 +4,7 @@
 - Regularly push Home Assistant config yaml files to github
 
 # New machine setup
-- Update workflows/ci-pipeline.yaml, add a new machine nick name to deploy.strategy.matrix.machine-name, e.g. home1,machine2,machine3,newmachine4. Push the change to main branch and the Github workflow should be triggered to create two IAM users - one for the docker container, oen for the host. The workflow will then build a docker image with the docker IAM user and push the image to ECR.
+- Update workflows/ci-pipeline.yaml, add a new machine nick name to deploy.strategy.matrix.machine-nick-name, e.g. home1,machine2,machine3,newmachine4. Push the change to main branch and the Github workflow should be triggered to create two IAM users - one for the docker container, oen for the host. The workflow will then build a docker image with the docker IAM user and push the image to ECR.
 - Go to aws console to get AWS Secret Access Key and AWS Access Key ID from the <strong>host</strong> user.
 - SSH to the new machine, install aws cli and configure AWS CLI with the above AWS credentials. Depending on the OS, you may need to use the relevant package manager to install the AWS CLI. Home Assistant Operating System for Raspberry Pi is based on Alpine Linux, so we use apk:
 ```
@@ -12,9 +12,14 @@ apk add aws-cli
 aws configure
 # enter AWS Secret Access Key and AWS Access Key ID from last step
 ```
-- Run the home-assistant-helper docker container
+- Run the home-assistant-helper docker container. Make sure to replace $machine_nickname with the value you defined earlier in the first step (deploy.strategy.matrix.machine-nick-name).
+
 ```
-TODO
+machine_nickname=home
+aws ecr get-login-password --region ap-southeast-2 \
+| docker login --username AWS --password-stdin 654654455942.dkr.ecr.ap-southeast-2.amazonaws.com
+docker pull 654654455942.dkr.ecr.ap-southeast-2.amazonaws.com/home-assistant-helper-home
+docker run -d --name home-assistant-helper --cap-add=CAP_NET_RAW,CAP_NET_BIND_SERVICE --restart=unless-stopped -v /homeassistant:/homeassistant:Z -v /backup:/backup:Z 654654455942.dkr.ecr.ap-southeast-2.amazonaws.com/home-assistant-helper-$machine_nickname
 ```
 
 

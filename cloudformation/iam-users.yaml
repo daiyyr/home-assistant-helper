@@ -7,7 +7,7 @@ Metadata:
     - Teemo Dai
 
 Parameters:
-  MahicneName:
+  MachineNickName:
     Type: String
     Description: Name of the machine to create the IAM user for
   HostedZoneId:
@@ -25,7 +25,7 @@ Resources:
   DockerUser:
     Type: AWS::IAM::User
     Properties:
-      UserName: !Sub "${MahicneName}-docker-user"
+      UserName: !Sub "${MachineNickName}-docker-user"
       Policies:
         - PolicyName: AllowUpdateR53andS3
           PolicyDocument:
@@ -42,7 +42,7 @@ Resources:
                 Condition:
                   StringLike:
                     "route53:ChangeResourceRecordSetsNormalizedRecordNames":
-                      - !Sub "${MahicneName}.${SecondLevelDomainName}"
+                      - !Sub "${MachineNickName}.${SecondLevelDomainName}"
                     "route53:ChangeResourceRecordSetsActions":
                       - CREATE
                       - UPSERT
@@ -56,15 +56,15 @@ Resources:
                   - s3:GetObject
                   - s3:PutObject
                   - s3:DeleteObject
-                Resource: !Sub arn:aws:s3:::the-alchemist-home-assistant/${MahicneName}/backup/*
+                Resource: !Sub arn:aws:s3:::the-alchemist-home-assistant/${MachineNickName}/backup/*
 
   # for the host to fetch the docker image from ECR
   HostUser:
     Type: AWS::IAM::User
     Properties:
-      UserName: !Sub "${MahicneName}-host-user"
+      UserName: !Sub "${MachineNickName}-host-user"
       Policies:
-        - PolicyName: AllowFetchECRImage${MahicneName}
+        - PolicyName: AllowFetchECRImage${MachineNickName}
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -80,4 +80,4 @@ Resources:
                   - ecr:BatchCheckLayerAvailability
                   - ecr:GetDownloadUrlForLayer
                   - ecr:BatchGetImage
-                Resource: arn:aws:ecr:ap-southeast-2:654654455942:repository/home-assistant-helper-${MahicneName}
+                Resource: arn:aws:ecr:ap-southeast-2:654654455942:repository/home-assistant-helper-${MachineNickName}
