@@ -64,7 +64,9 @@ jobs:
 # next:
 # github needs to get the aws credentials for the docker user
 # then build the docker image
-# --build-arg MACHINE_NICKNAME=home --build-arg GITHUB_TOKEN=github-token-for-home-assistant-config
-
+# --build-arg AWS_ACCESS_KEY_ID=??? # key for the host user
+# --build-arg AWS_SECRET_ACCESS_KEY=
+# --build-arg GITHUB_TOKEN= # github token for pushing to the repo home-assistant-config
+# --build-arg MACHINE_NICKNAME=${{ matrix.machine-nick-name }}
 # then push the docker image to ECR
 
