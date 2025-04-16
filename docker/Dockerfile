@@ -36,15 +36,12 @@ COPY scripts/* /homeassistant/home-assistant-helper/scripts/
 # Set the machine nickname
 RUN echo "$MACHINE_NICKNAME" > /homeassistant/machine_nickname.txt
 
-# Clone the helper script repo
-WORKDIR /homeassistant
-RUN git clone https://github.com/daiyyr/home-assistant-helper
-
 # Store Git credentials (bind a pre-configured .git-credentials at runtime)
 RUN git config --global credential.helper store \
     && echo "https://home-assistant-raspberry-pi:${GITHUB_TOKEN}@github.com" > /root/.git-credentials
 
 # Clone the Home Assistant config repo
+WORKDIR /homeassistant
 RUN git clone https://github.com/daiyyr/home-assistant-config
 
 # Add cron jobs
