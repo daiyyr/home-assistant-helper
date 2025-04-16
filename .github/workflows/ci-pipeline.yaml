@@ -1,0 +1,90 @@
+name: ci-pipeline
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/ci-pipeline.yaml'
+      - 'cloudformation/stack-for-one-home.yaml'
+      - 'docker/**'
+
+jobs:
+  lint:
+    name: cfnLint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install cfn-lint
+        run: |
+          pip install cfn-lint
+
+      - name: Lint CloudFormation template
+        run: |
+          cfn-lint cloudformation/stack-for-one-home.yaml
+
+  deploy:
+    name: DeployCloudformation
+    needs: [lint]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        machine-nick-name: [home] # You can add more machine names here, e.g., [home1, home2, machine3, machine4]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Configure AWS credentials
+        id: creds
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-southeast-2
+      
+      - name: deploy-cfn-home-assistant-${{ matrix.machine-nick-name }}
+        id: home-assistant-${{ matrix.machine-nick-name }}
+        uses: aws-actions/aws-cloudformation-github-deploy@master
+        with:
+          name: home-assistant-${{ matrix.machine-nick-name }}
+          template: cloudformation/stack-for-one-home.yaml
+          no-fail-on-empty-changeset: "1"
+          parameter-overrides: >
+            MachineNickName=${{ matrix.machine-nick-name }}
+          capabilities: CAPABILITY_NAMED_IAM
+
+      - name: Get credentials from the cfn stack
+        id: get_credentials
+        run: |
+          RawDockerUserAccessKeyId=$(aws cloudformation describe-stacks --stack-name home-assistant-${{ matrix.machine-nick-name }} --query "Stacks[0].Outputs[?OutputKey=='DockerUserAccessKeyId'].OutputValue" --output text)
+          Base64RawDockerUserAccessKeyId = $(echo -n $RawDockerUserAccessKeyId | base64 -w 0)
+          echo "DockerUserAccessKeyId=$Base64RawDockerUserAccessKeyId" >> $GITHUB_OUTPUT
+
+          RawDockerUserSecretAccessKey=$(aws cloudformation describe-stacks --stack-name home-assistant-${{ matrix.machine-nick-name }} --query "Stacks[0].Outputs[?OutputKey=='DockerUserSecretAccessKey'].OutputValue" --output text)
+          Base64RawDockerUserSecretAccessKey = $(echo -n $RawDockerUserSecretAccessKey | base64 -w 0)
+          echo "DockerUserSecretAccessKey=$Base64RawDockerUserSecretAccessKey" >> $GITHUB_OUTPUT
+
+      - name: Build docker image home-assistant-helper-${{ matrix.machine-nick-name }}
+        run: |
+          AWS_ACCESS_KEY_ID=`echo -n ${{steps.get_credentials.outputs.DockerUserAccessKeyId}} | base64 --decode`
+          AWS_SECRET_ACCESS_KEY=`echo -n ${{steps.get_credentials.outputs.DockerUserSecretAccessKey}} | base64 --decode`
+          docker buildx build \
+            --build-arg AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+            --build-arg AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+            --build-arg GITHUB_TOKEN=${{ secrets.home_assistance_config_github_pat }} \
+            --build-arg MACHINE_NICKNAME=${{ env.machine-nick-name }} \
+            -t home-assistant-helper-${{ matrix.machine-nick-name }} \
+            ./docker
+          
+          aws ecr get-login-password --region ap-southeast-2 \
+          | docker login --username AWS --password-stdin 654654455942.dkr.ecr.ap-southeast-2.amazonaws.com
+          docker tag home-assistant-helper-${{ matrix.machine-nick-name }}:latest 654654455942.dkr.ecr.ap-southeast-2.amazonaws.com/home-assistant-helper-${{ matrix.machine-nick-name }}:latest
+          docker push 654654455942.dkr.ecr.ap-southeast-2.amazonaws.com/home-assistant-helper-${{ matrix.machine-nick-name }}:latest

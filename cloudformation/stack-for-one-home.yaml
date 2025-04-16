@@ -1,0 +1,106 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: CFN stack to create IAM users for the docker and host machine, and an ECR repository for the docker image.
+
+Metadata:
+  Author:
+    - Teemo Dai
+
+Parameters:
+  MachineNickName:
+    Type: String
+    Description: Name of the machine to create the IAM user for
+  HostedZoneId:
+    Type: String
+    Description: Route 53 Hosted Zone ID
+    Default: Z06958611JDYVCG41K93R
+  SecondLevelDomainName:
+    Type: String
+    Description: SLD, the domain name you registered (e.g., "example" in "example.com")
+    Default: the-alchemist.link
+
+Resources:
+
+  # IAM user for the docker to update R53 records and S3
+  DockerUser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Sub "${MachineNickName}-docker-user"
+      Policies:
+        - PolicyName: AllowUpdateR53andS3
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - route53:GetHostedZone
+                Resource: '*'
+
+              - Effect: Allow
+                Action: route53:ChangeResourceRecordSets
+                Resource: !Sub arn:aws:route53:::hostedzone/${HostedZoneId}
+                Condition:
+                  StringLike:
+                    "route53:ChangeResourceRecordSetsNormalizedRecordNames":
+                      - !Sub "${MachineNickName}.${SecondLevelDomainName}"
+                    "route53:ChangeResourceRecordSetsActions":
+                      - CREATE
+                      - UPSERT
+
+              - Effect: Allow
+                Action:
+                  - s3:ListBucket
+                Resource: arn:aws:s3:::the-alchemist-home-assistant
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:DeleteObject
+                Resource: !Sub arn:aws:s3:::the-alchemist-home-assistant/${MachineNickName}/backup/*
+
+  DockerUserAccessKey:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref DockerUser
+
+  # IAM user for the host to fetch the docker image from ECR
+  HostUser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Sub "${MachineNickName}-host-user"
+      Policies:
+        - PolicyName: AllowFetchECRImage${MachineNickName}
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: ECRAuthToken
+                Effect: Allow
+                Action:
+                  - ecr:GetAuthorizationToken
+                Resource: "*"
+
+              - Sid: AllowPullFromSpecificRepo
+                Effect: Allow
+                Action:
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:GetDownloadUrlForLayer
+                  - ecr:BatchGetImage
+                Resource: arn:aws:ecr:ap-southeast-2:654654455942:repository/home-assistant-helper-${MachineNickName}
+
+
+  # ECR repository for the docker image
+  ECRRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Sub "home-assistant-helper-${MachineNickName}"
+
+Outputs:
+  DockerUserAccessKeyId:
+    Value: !Ref DockerUserAccessKey.Id
+    Export:
+      Name: !Sub "${MachineNickName}-DockerUserAccessKeyId"
+
+  DockerUserSecretAccessKey:
+    Value: !GetAtt DockerUserAccessKey.SecretAccessKey
+    Export:
+      Name: !Sub "${MachineNickName}-DockerUserSecretAccessKey"
