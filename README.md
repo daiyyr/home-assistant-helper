@@ -4,25 +4,22 @@
 - Regularly push Home Assistant config yaml files to github
 
 # New machine setup
-- Update workflows/ci-pipeline.yaml, add a new machine nick name to deploy.strategy.matrix.machine-nick-name, e.g. home1,machine2,machine3,newmachine4. Push the change to main branch and the Github workflow should be triggered to create two IAM users - one for the docker container, oen for the host. The workflow will then build a docker image with the docker IAM user and push the image to ECR.
-- Go to aws console, generate a pair of AWS Secret Access Key and AWS Access Key ID from the docker user.
-- SSH to the new machine, install aws cli and configure AWS CLI with the above AWS credentials. Depending on the OS, you may need to use the relevant package manager to install the AWS CLI. Home Assistant Operating System for Raspberry Pi is based on Alpine Linux, so we use apk. Make sure to replace $machine_nickname with the value you defined earlier in the first step (deploy.strategy.matrix.machine-nick-name).
-```
-machine_nickname=home
+- Update .github/workflows/ci-pipeline.yaml, add a new machine to deploy.strategy.matrix.machine-nick-name, e.g. home,home2,machine3,new_machine4. The Github workflow will be triggered to create a new cloud formation stack with aws resources for this machine.
+- Go to aws console to get AWS Secret Access Key and AWS Access Key ID from the new user home-assistant-<machine-nick-name>.
+- SSH to the new machine, install aws cli and configure AWS CLI with the above AWS credentials, and then start the cron job. Depending on the OS, you may need to use the relevant package manager to install the AWS CLI. Home Assistant Operating System for Raspberry Pi is based on Alpine Linux, so we use apk. Make sure to replace $MACHINE_NICKNAME with the value you defined earlier in the first step (deploy.strategy.matrix.machine-nick-name).
 
-apk add aws-cli cronie openrc
+```
+export MACHINE_NICKNAME="home" # update this value for each machine
+
+apk add git cronie openrc aws-cli curl
 aws configure
 # enter AWS Secret Access Key and AWS Access Key ID from the previous step
 
-touch /var/log/copy-files.log
-echo "#!/bin/sh" > /tmp/backup.sh
-echo "cp -R /root/.aws /tmp/" >> /tmp/backup.sh
-echo "cp -R /homeassistant /tmp/" >> /tmp/backup.sh
-echo "cp -R /backup /tmp/" >> /tmp/backup.sh
-echo "*/3 * * * * /tmp/backup.sh >> /var/log/copy-files.log 2>&1" >> /etc/crontabs/root
-chmod +x /tmp/backup.sh
-crond
-
-aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin 654654455942.dkr.ecr.ap-southeast-2.amazonaws.com
-docker run -d -u $(id -u):$(id -g) --pull=always --restart=unless-stopped -v /tmp/.aws:/root/.aws -v /tmp/homeassistant:/homeassistant -v /tmp/backup:/backup 654654455942.dkr.ecr.ap-southeast-2.amazonaws.com/home-assistant-helper-$machine_nickname
+echo "$MACHINE_NICKNAME" > /opt/machine_nickname.txt
+cd /opt
+clone https://github.com/daiyyr/home-assistant-helper
+mkdir /root/.cache
+echo "*/5 * * * * /opt/home-assistant-helper/scripts/update-dns.sh >> /var/log/update-dns.log 2>&1" >> /etc/crontabs/root \
+echo "0 3 * * 0 /opt/home-assistant-helper/scripts/backup-to-s3.sh >> /var/log/s3-backup.log 2>&1" >> /etc/crontabs/root \
+echo "*/3 * * * * /opt/home-assistant-helper/scripts/push-to-github.sh >/var/log/github-backup.log 2>&1" >> /etc/crontabs/root
 ```

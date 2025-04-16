@@ -59,21 +59,23 @@ jobs:
             MachineNickName=${{ matrix.machine-nick-name }}
           capabilities: CAPABILITY_NAMED_IAM
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
+      # dockerization is blocked by the HAOS being a read-only filesystem - mount is not allowed
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      # - name: Login to Amazon ECR
+      #   id: login-ecr
+      #   uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build and push home-assistant-helper-${{ matrix.machine-nick-name }}
-        uses: docker/build-push-action@v6
-        with:
-          context: ./docker
-          file: ./docker/Dockerfile
-          platforms: linux/arm64/v8
-          push: true
-          tags: 654654455942.dkr.ecr.ap-southeast-2.amazonaws.com/home-assistant-helper-${{ matrix.machine-nick-name }}:latest
-          build-args: |
-            GITHUB_TOKEN="${{ secrets.HOME_ASSISTANCE_CONFIG_GITHUB_PAT }}" \
-            MACHINE_NICKNAME="${{ matrix.machine-nick-name }}"
+      # - name: Set up Docker Buildx
+      #   uses: docker/setup-buildx-action@v3
+
+      # - name: Build and push home-assistant-helper-${{ matrix.machine-nick-name }}
+      #   uses: docker/build-push-action@v6
+      #   with:
+      #     context: ./docker
+      #     file: ./docker/Dockerfile
+      #     platforms: linux/arm64/v8
+      #     push: true
+      #     tags: 654654455942.dkr.ecr.ap-southeast-2.amazonaws.com/home-assistant-helper-${{ matrix.machine-nick-name }}:latest
+      #     build-args: |
+      #       GITHUB_TOKEN="${{ secrets.HOME_ASSISTANCE_CONFIG_GITHUB_PAT }}" \
+      #       MACHINE_NICKNAME="${{ matrix.machine-nick-name }}"

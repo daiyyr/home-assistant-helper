@@ -1,5 +1,5 @@
 #!/bin/bash
-
+MACHINE_NICKNAME=`cat /opt/machine_nickname.txt`
 R53HostedZoneId="Z06958611JDYVCG41K93R"
 
 IP_FILE="/opt/previous-ip.txt"
