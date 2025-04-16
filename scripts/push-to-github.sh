@@ -15,7 +15,7 @@ cd /opt/home-assistant-config
 git pull
 
 cp /homeassistant/*.yaml ./$MACHINE_NICKNAME/
-cp /homeassistant/esphome ./$MACHINE_NICKNAME/
+cp -R /homeassistant/esphome ./$MACHINE_NICKNAME/
 # maybe add more folder here in the future
 
 

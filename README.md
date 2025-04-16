@@ -19,8 +19,8 @@ echo "$MACHINE_NICKNAME" > /opt/machine_nickname.txt
 cd /opt
 git clone https://github.com/daiyyr/home-assistant-helper
 mkdir -p /root/.cache
-echo "*/5 * * * * /opt/home-assistant-helper/scripts/update-dns.sh >> /var/log/update-dns.log 2>&1" >> /etc/crontabs/root \
-echo "0 3 * * 0 /opt/home-assistant-helper/scripts/backup-to-s3.sh >> /var/log/s3-backup.log 2>&1" >> /etc/crontabs/root \
-echo "*/3 * * * * /opt/home-assistant-helper/scripts/push-to-github.sh >/var/log/github-backup.log 2>&1" >> /etc/crontabs/root
+echo "*/5 * * * * /opt/home-assistant-helper/scripts/update-dns.sh >> /var/log/update-dns.log 2>&1" >> /etc/crontabs/root
+echo "0 3 * * 0 /opt/home-assistant-helper/scripts/backup-to-s3.sh >> /var/log/s3-backup.log 2>&1" >> /etc/crontabs/root
+echo "*/3 * * * * /opt/home-assistant-helper/scripts/push-to-github.sh >> /var/log/github-backup.log 2>&1" >> /etc/crontabs/root
 crond
 ```
