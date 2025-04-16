@@ -29,5 +29,5 @@ RUN echo "*/5 * * * * /opt/scripts/update-dns.sh >> /var/log/update-dns.log 2>&1
 RUN echo "#!/bin/sh" > /opt/entrypoint.sh
 RUN echo "crond" >> /opt/entrypoint.sh
 RUN echo "tail -f /dev/null" >> /opt/entrypoint.sh
-RUN chmod +x entrypoint.sh
+RUN chmod +x /opt/entrypoint.sh
 ENTRYPOINT ["/opt/entrypoint.sh"]
