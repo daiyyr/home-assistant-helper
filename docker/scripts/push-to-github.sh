@@ -1,6 +1,15 @@
 #!/bin/bash
 
 # This script is used to push the home assistant config files to github
+
+GITHUB_TOKEN=$(aws ssm get-parameter --name /github/pat/home-assistant-config --with-decryption --query 'Parameter.Value' --output text --region="ap-southeast-2")
+
+cd /opt
+
+if [ ! -d "/opt/home-assistant-config" ]; then
+    git clone https://${MACHINE_NICKNAME}:${GITHUB_TOKEN}@github.com/daiyyr/home-assistant-config
+fi
+
 mkdir -p /opt/home-assistant-config/$MACHINE_NICKNAME
 cd /opt/home-assistant-config
 git pull

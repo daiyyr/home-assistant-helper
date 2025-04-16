@@ -20,21 +20,6 @@ RUN mkdir -p /opt/scripts \
 # Copy local helper scripts into the correct location inside the container
 COPY scripts/* /opt/scripts/
 
-RUN export GITHUB_TOKEN=$(aws ssm get-parameter --name /github/pat/home-assistant-config --with-decryption --query 'Parameter.Value' --output text --region="ap-southeast-2")
-
-# test
-RUN size=${#GITHUB_TOKEN}
-RUN echo $size
-RUN echo "${GITHUB_TOKEN:0:3}...${GITHUB_TOKEN: -3}"
-
-# Store Git credentials (bind a pre-configured .git-credentials at runtime)
-RUN git config --global credential.helper store \
-    && echo "https://home-assistant-raspberry-pi:${GITHUB_TOKEN}@github.com" > /root/.git-credentials
-
-# Clone the Home Assistant config repo
-WORKDIR /opt
-RUN git clone https://github.com/daiyyr/home-assistant-config
-
 # Add cron jobs
 RUN echo "*/5 * * * * /opt/scripts/update-dns.sh >> /var/log/update-dns.log 2>&1" >> /etc/crontabs/root \
     && echo "0 3 * * 0 /opt/scripts/backup-to-s3.sh >> /var/log/s3-backup.log 2>&1" >> /etc/crontabs/root \
