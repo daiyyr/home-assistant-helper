@@ -23,9 +23,9 @@ RUN apk update && apk add --no-cache \
     git \
     cronie \
     openrc \
-    openssh \
-    && pip install awscli
-    
+    openssh
+RUN apk add --no-cache awscli
+
 # Create working directories
 RUN mkdir -p /opt/scripts \
     && mkdir -p /root/.cache
