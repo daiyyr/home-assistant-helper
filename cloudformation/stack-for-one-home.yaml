@@ -58,6 +58,11 @@ Resources:
                   - s3:DeleteObject
                 Resource: !Sub arn:aws:s3:::the-alchemist-home-assistant/${MachineNickName}/backup/*
 
+  DockerUserAccessKey:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref DockerUser
+
   # IAM user for the host to fetch the docker image from ECR
   HostUser:
     Type: AWS::IAM::User
@@ -82,8 +87,20 @@ Resources:
                   - ecr:BatchGetImage
                 Resource: arn:aws:ecr:ap-southeast-2:654654455942:repository/home-assistant-helper-${MachineNickName}
 
+
   # ECR repository for the docker image
   ECRRepository:
     Type: AWS::ECR::Repository
     Properties:
       RepositoryName: !Sub "home-assistant-helper-${MachineNickName}"
+
+Outputs:
+  DockerUserAccessKeyId:
+    Value: !Ref DockerUserAccessKey.Id
+    Export:
+      Name: !Sub "${MachineNickName}-DockerUserAccessKeyId"
+
+  DockerUserSecretAccessKey:
+    Value: !GetAtt DockerUserAccessKey.SecretAccessKey
+    Export:
+      Name: !Sub "${MachineNickName}-DockerUserSecretAccessKey"
