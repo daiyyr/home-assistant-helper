@@ -5,7 +5,7 @@
 
 # New machine setup
 - Update .github/workflows/ci-pipeline.yaml, add a new machine to deploy.strategy.matrix.machine-nick-name, e.g. home,home2,machine3,new_machine4. The Github workflow will be triggered to create a new cloud formation stack with aws resources for this machine.
-- Go to aws console to get AWS Secret Access Key and AWS Access Key ID from the new user home-assistant-<machine-nick-name>.
+- Go to aws console to get AWS Secret Access Key and AWS Access Key ID from the new user home-assistant-{machine-nick-name}.
 - SSH to the new machine, install aws cli and configure AWS CLI with the above AWS credentials, and then start the cron job. Depending on the OS, you may need to use the relevant package manager to install the AWS CLI. Home Assistant Operating System for Raspberry Pi is based on Alpine Linux, so we use apk. Make sure to replace $MACHINE_NICKNAME with the value you defined earlier in the first step (deploy.strategy.matrix.machine-nick-name).
 
 ```
@@ -16,6 +16,8 @@ aws configure
 # enter AWS Secret Access Key and AWS Access Key ID from the previous step
 
 echo "$MACHINE_NICKNAME" > /opt/machine_nickname.txt
+git config --global user.name "$MACHINE_NICKNAME"
+git config --global user.email "$MACHINE_NICKNAME@the-alchemist.com"
 cd /opt
 git clone https://github.com/daiyyr/home-assistant-helper
 mkdir -p /root/.cache
