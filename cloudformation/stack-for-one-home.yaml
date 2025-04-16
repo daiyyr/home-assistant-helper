@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
-Description: CFN stack for one home assistant os machine e.g. a raspberry pi
+Description: Resources for a local Home Assistant OS e.g. my raspberry pi
 
 Metadata:
   Author:
@@ -21,11 +21,10 @@ Parameters:
 
 Resources:
 
-  # IAM user for the docker to update R53 records and S3, and to pull from ECR repo home-assistant-helper-${MachineNickName}
-  DockerUser:
+  HomeAssistantUser:
     Type: AWS::IAM::User
     Properties:
-      UserName: !Sub "${MachineNickName}-docker-user"
+      UserName: !Sub "home-assistant-user-${MachineNickName}"
       Policies:
         - PolicyName: AllowUpdateR53andS3
           PolicyDocument:
@@ -69,25 +68,20 @@ Resources:
                   - ecr:GetDownloadUrlForLayer
                   - ecr:BatchGetImage
                 Resource: !Sub arn:aws:ecr:ap-southeast-2:654654455942:repository/home-assistant-helper-${MachineNickName}
+              
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                  - ssm:GetParameters
+                Resource: arn:aws:ssm:ap-southeast-2:654654455942:parameter/github/pat/home-assistant-config
 
-  DockerUserAccessKey:
+  HomeAssistantUserAccessKey:
     Type: AWS::IAM::AccessKey
     Properties:
-      UserName: !Ref DockerUser
+      UserName: !Ref HomeAssistantUser
 
-  # ECR repository for the docker image
+
   ECRRepository:
     Type: AWS::ECR::Repository
     Properties:
       RepositoryName: !Sub "home-assistant-helper-${MachineNickName}"
-
-Outputs:
-  DockerUserAccessKeyId:
-    Value: !Ref DockerUserAccessKey
-    Export:
-      Name: !Sub "${MachineNickName}-DockerUserAccessKeyId"
-
-  DockerUserSecretAccessKey:
-    Value: !GetAtt DockerUserAccessKey.SecretAccessKey
-    Export:
-      Name: !Sub "${MachineNickName}-DockerUserSecretAccessKey"

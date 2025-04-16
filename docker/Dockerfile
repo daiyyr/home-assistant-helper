@@ -1,11 +1,9 @@
 FROM arm64v8/alpine:3.21.3
 
 # Build arguments
-ARG GITHUB_TOKEN
 ARG MACHINE_NICKNAME
 
 # Make them available inside the container
-ENV GITHUB_TOKEN=$GITHUB_TOKEN
 ENV MACHINE_NICKNAME=$MACHINE_NICKNAME
 
 ARG AWS_DEFAULT_REGION=ap-southeast-2
@@ -21,6 +19,8 @@ RUN mkdir -p /opt/scripts \
 
 # Copy local helper scripts into the correct location inside the container
 COPY scripts/* /opt/scripts/
+
+RUN export GITHUB_TOKEN=$(aws ssm get-parameter --name /github/pat/home-assistant-config --with-decryption --query 'Parameter.Value' --output text --region="ap-southeast-2")
 
 # test
 RUN size=${#GITHUB_TOKEN}
