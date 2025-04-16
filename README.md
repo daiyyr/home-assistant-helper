@@ -5,7 +5,7 @@
 
 # New machine setup
 - Update workflows/ci-pipeline.yaml, add a new machine nick name to deploy.strategy.matrix.machine-nick-name, e.g. home1,machine2,machine3,newmachine4. Push the change to main branch and the Github workflow should be triggered to create two IAM users - one for the docker container, oen for the host. The workflow will then build a docker image with the docker IAM user and push the image to ECR.
-- Go to aws console, generate a pair of AWS Secret Access Key and AWS Access Key ID from the <strong>host</strong> user.
+- Go to aws console, generate a pair of AWS Secret Access Key and AWS Access Key ID from the docker user.
 - SSH to the new machine, install aws cli and configure AWS CLI with the above AWS credentials. Depending on the OS, you may need to use the relevant package manager to install the AWS CLI. Home Assistant Operating System for Raspberry Pi is based on Alpine Linux, so we use apk:
 ```
 apk add aws-cli
@@ -18,7 +18,7 @@ aws configure
 machine_nickname=home
 aws ecr get-login-password --region ap-southeast-2 \
 | docker login --username AWS --password-stdin 654654455942.dkr.ecr.ap-southeast-2.amazonaws.com
-docker run -d --pull=always --restart=unless-stopped -v /homeassistant:/homeassistant:ro -v /backup:/backup:ro 654654455942.dkr.ecr.ap-southeast-2.amazonaws.com/home-assistant-helper-$machine_nickname
+docker run -d --pull=always --restart=unless-stopped -v ~/.aws/:/root/.aws:ro -v /homeassistant:/homeassistant:ro -v /backup:/backup:ro 654654455942.dkr.ecr.ap-southeast-2.amazonaws.com/home-assistant-helper-$machine_nickname
 ```
 
 

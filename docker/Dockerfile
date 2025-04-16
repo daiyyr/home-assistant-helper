@@ -1,17 +1,12 @@
 FROM arm64v8/alpine:3.21.3
 
 # Build arguments
-ARG AWS_ACCESS_KEY_ID
-ARG AWS_SECRET_ACCESS_KEY
 ARG GITHUB_TOKEN
 ARG MACHINE_NICKNAME
 
 # Make them available inside the container
-ENV AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
-ENV AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
 ENV GITHUB_TOKEN=$GITHUB_TOKEN
 ENV MACHINE_NICKNAME=$MACHINE_NICKNAME
-
 
 ARG AWS_DEFAULT_REGION=ap-southeast-2
 ENV AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION
@@ -28,6 +23,8 @@ RUN mkdir -p /opt/scripts \
 COPY scripts/* /opt/scripts/
 
 # test
+RUN size=${#GITHUB_TOKEN}
+RUN echo $size
 RUN echo "${GITHUB_TOKEN:0:3}...${GITHUB_TOKEN: -3}"
 
 # Store Git credentials (bind a pre-configured .git-credentials at runtime)

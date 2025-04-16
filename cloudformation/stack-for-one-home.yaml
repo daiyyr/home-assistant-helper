@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
-Description: CFN stack to create IAM users for the docker and host machine, and an ECR repository for the docker image.
+Description: CFN stack for one home assistant os machine e.g. a raspberry pi
 
 Metadata:
   Author:
@@ -9,7 +9,7 @@ Metadata:
 Parameters:
   MachineNickName:
     Type: String
-    Description: Name of the machine to create the IAM user for
+    Description: Nick name of the machine
   HostedZoneId:
     Type: String
     Description: Route 53 Hosted Zone ID
@@ -21,7 +21,7 @@ Parameters:
 
 Resources:
 
-  # IAM user for the docker to update R53 records and S3
+  # IAM user for the docker to update R53 records and S3, and to pull from ECR repo home-assistant-helper-${MachineNickName}
   DockerUser:
     Type: AWS::IAM::User
     Properties:
@@ -58,35 +58,22 @@ Resources:
                   - s3:DeleteObject
                 Resource: !Sub arn:aws:s3:::the-alchemist-home-assistant/${MachineNickName}/backup/*
 
-  DockerUserAccessKey:
-    Type: AWS::IAM::AccessKey
-    Properties:
-      UserName: !Ref DockerUser
-
-  # IAM user for the host to fetch the docker image from ECR
-  HostUser:
-    Type: AWS::IAM::User
-    Properties:
-      UserName: !Sub "${MachineNickName}-host-user"
-      Policies:
-        - PolicyName: !Sub AllowFetchECRImage${MachineNickName}
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Sid: ECRAuthToken
-                Effect: Allow
+              - Effect: Allow
                 Action:
                   - ecr:GetAuthorizationToken
                 Resource: "*"
 
-              - Sid: AllowPullFromSpecificRepo
-                Effect: Allow
+              - Effect: Allow
                 Action:
                   - ecr:BatchCheckLayerAvailability
                   - ecr:GetDownloadUrlForLayer
                   - ecr:BatchGetImage
                 Resource: !Sub arn:aws:ecr:ap-southeast-2:654654455942:repository/home-assistant-helper-${MachineNickName}
 
+  DockerUserAccessKey:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref DockerUser
 
   # ECR repository for the docker image
   ECRRepository:

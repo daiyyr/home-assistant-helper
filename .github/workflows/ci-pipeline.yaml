@@ -59,20 +59,6 @@ jobs:
             MachineNickName=${{ matrix.machine-nick-name }}
           capabilities: CAPABILITY_NAMED_IAM
 
-      - name: Get credentials from the cfn stack
-        id: get_credentials
-        run: |
-          RawDockerUserAccessKeyId=$(aws cloudformation describe-stacks --stack-name home-assistant-${{ matrix.machine-nick-name }} --query "Stacks[0].Outputs[?OutputKey=='DockerUserAccessKeyId'].OutputValue" --output text)
-          # Base64DockerUserAccessKeyId=$(echo -n $RawDockerUserAccessKeyId | base64 -w 0)
-          echo "DockerUserAccessKeyId=$RawDockerUserAccessKeyId" >> $GITHUB_OUTPUT
-
-          RawDockerUserSecretAccessKey=$(aws cloudformation describe-stacks --stack-name home-assistant-${{ matrix.machine-nick-name }} --query "Stacks[0].Outputs[?OutputKey=='DockerUserSecretAccessKey'].OutputValue" --output text)
-          # Base64DockerUserSecretAccessKey=$(echo -n $RawDockerUserSecretAccessKey | base64 -w 0)
-          echo "DockerUserSecretAccessKey=$RawDockerUserSecretAccessKey" >> $GITHUB_OUTPUT
-
-          aws ecr get-login-password --region ap-southeast-2 \
-          | docker login --username AWS --password-stdin 654654455942.dkr.ecr.ap-southeast-2.amazonaws.com
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -86,6 +72,4 @@ jobs:
           tags: 654654455942.dkr.ecr.ap-southeast-2.amazonaws.com/home-assistant-helper-${{ matrix.machine-nick-name }}:latest
           build-args: |
             GITHUB_TOKEN="${{ secrets.HOME_ASSISTANCE_CONFIG_GITHUB_PAT }}" \
-            MACHINE_NICKNAME="${{ matrix.machine-nick-name }}" \
-            AWS_ACCESS_KEY_ID="${{ steps.get_credentials.outputs.DockerUserAccessKeyId }}" \
-            AWS_SECRET_ACCESS_KEY="${{ steps.get_credentials.outputs.DockerUserSecretAccessKey }}"
+            MACHINE_NICKNAME="${{ matrix.machine-nick-name }}"
