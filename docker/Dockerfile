@@ -11,7 +11,7 @@ ENV AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION
 
 # Install required packages
 RUN apk update
-RUN apk add --no-cache bash git cronie openrc openssh aws-cli
+RUN apk add --no-cache bash git cronie openrc openssh aws-cli curl
 
 # Create working directories
 RUN mkdir -p /opt/scripts \
