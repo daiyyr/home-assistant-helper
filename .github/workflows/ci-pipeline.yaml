@@ -63,12 +63,12 @@ jobs:
         id: get_credentials
         run: |
           RawDockerUserAccessKeyId=$(aws cloudformation describe-stacks --stack-name home-assistant-${{ matrix.machine-nick-name }} --query "Stacks[0].Outputs[?OutputKey=='DockerUserAccessKeyId'].OutputValue" --output text)
-          Base64RawDockerUserAccessKeyId=$(echo -n $RawDockerUserAccessKeyId | base64 -w 0)
-          echo "DockerUserAccessKeyId=$Base64RawDockerUserAccessKeyId" >> $GITHUB_OUTPUT
+          # Base64DockerUserAccessKeyId=$(echo -n $RawDockerUserAccessKeyId | base64 -w 0)
+          echo "DockerUserAccessKeyId=$RawDockerUserAccessKeyId" >> $GITHUB_OUTPUT
 
           RawDockerUserSecretAccessKey=$(aws cloudformation describe-stacks --stack-name home-assistant-${{ matrix.machine-nick-name }} --query "Stacks[0].Outputs[?OutputKey=='DockerUserSecretAccessKey'].OutputValue" --output text)
-          Base64RawDockerUserSecretAccessKey=$(echo -n $RawDockerUserSecretAccessKey | base64 -w 0)
-          echo "DockerUserSecretAccessKey=$Base64RawDockerUserSecretAccessKey" >> $GITHUB_OUTPUT
+          # Base64DockerUserSecretAccessKey=$(echo -n $RawDockerUserSecretAccessKey | base64 -w 0)
+          echo "DockerUserSecretAccessKey=$RawDockerUserSecretAccessKey" >> $GITHUB_OUTPUT
 
           aws ecr get-login-password --region ap-southeast-2 \
           | docker login --username AWS --password-stdin 654654455942.dkr.ecr.ap-southeast-2.amazonaws.com
@@ -85,26 +85,7 @@ jobs:
           push: true
           tags: 654654455942.dkr.ecr.ap-southeast-2.amazonaws.com/home-assistant-helper-${{ matrix.machine-nick-name }}:latest
           build-args: |
-            AWS_ACCESS_KEY_ID=`echo -n ${{steps.get_credentials.outputs.DockerUserAccessKeyId}} | base64 --decode` \
-            AWS_SECRET_ACCESS_KEY=`echo -n ${{steps.get_credentials.outputs.DockerUserSecretAccessKey}} | base64 --decode` \
-            GITHUB_TOKEN=${{ secrets.home_assistance_config_github_pat }} \
-            MACHINE_NICKNAME=${{ matrix.machine-nick-name }} \
-
-
-      # - name: Build docker image home-assistant-helper-${{ matrix.machine-nick-name }}
-      #   run: |
-      #     DOCKER_USER_AWS_ACCESS_KEY_ID=`echo -n ${{steps.get_credentials.outputs.DockerUserAccessKeyId}} | base64 --decode`
-      #     DOCKER_USER_AWS_SECRET_ACCESS_KEY=`echo -n ${{steps.get_credentials.outputs.DockerUserSecretAccessKey}} | base64 --decode`
-      #     docker buildx build \
-      #       --platform linux/arm64/v8 \
-      #       --build-arg AWS_ACCESS_KEY_ID=$DOCKER_USER_AWS_ACCESS_KEY_ID \
-      #       --build-arg AWS_SECRET_ACCESS_KEY=$DOCKER_USER_AWS_SECRET_ACCESS_KEY \
-      #       --build-arg GITHUB_TOKEN=${{ secrets.home_assistance_config_github_pat }} \
-      #       --build-arg MACHINE_NICKNAME=${{ matrix.machine-nick-name }} \
-      #       -t home-assistant-helper-${{ matrix.machine-nick-name }} \
-      #       ./docker
-          
-      #     aws ecr get-login-password --region ap-southeast-2 \
-      #     | docker login --username AWS --password-stdin 654654455942.dkr.ecr.ap-southeast-2.amazonaws.com
-      #     docker tag home-assistant-helper-${{ matrix.machine-nick-name }}:latest 654654455942.dkr.ecr.ap-southeast-2.amazonaws.com/home-assistant-helper-${{ matrix.machine-nick-name }}:latest
-      #     docker push 654654455942.dkr.ecr.ap-southeast-2.amazonaws.com/home-assistant-helper-${{ matrix.machine-nick-name }}:latest
+            GITHUB_TOKEN="${{ secrets.home_assistance_config_github_pat }}" \
+            MACHINE_NICKNAME="${{ matrix.machine-nick-name }}" \
+            AWS_ACCESS_KEY_ID="${{ steps.get_credentials.outputs.DockerUserAccessKeyId }}" \
+            AWS_SECRET_ACCESS_KEY="${{ steps.get_credentials.outputs.DockerUserSecretAccessKey }}"
