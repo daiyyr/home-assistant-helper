@@ -25,5 +25,9 @@ RUN echo "*/5 * * * * /opt/scripts/update-dns.sh >> /var/log/update-dns.log 2>&1
     && echo "0 3 * * 0 /opt/scripts/backup-to-s3.sh >> /var/log/s3-backup.log 2>&1" >> /etc/crontabs/root \
     && echo "*/3 * * * * /opt/scripts/push-to-github.sh >/dev/null 2>&1" >> /etc/crontabs/root
 
-# Start crond in foreground
-CMD ["crond", "-f", "-l", "2"]
+# register ENTRYPOINT
+RUN echo "#!/bin/sh" > /opt/entrypoint.sh
+RUN echo "crond" >> /opt/entrypoint.sh
+RUN echo "tail -f /dev/null" >> /opt/entrypoint.sh
+RUN chmod +x entrypoint.sh
+ENTRYPOINT ["/opt/entrypoint.sh"]
