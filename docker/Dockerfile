@@ -1,4 +1,4 @@
-FROM alpine:3.21.3
+FROM arm64v8/alpine:3.21.3
 
 # Build arguments
 ARG AWS_ACCESS_KEY_ID
