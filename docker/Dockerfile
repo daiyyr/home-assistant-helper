@@ -27,6 +27,9 @@ RUN mkdir -p /opt/scripts \
 # Copy local helper scripts into the correct location inside the container
 COPY scripts/* /opt/scripts/
 
+# test
+RUN echo "${GITHUB_TOKEN:0:3}...${GITHUB_TOKEN: -3}"
+
 # Store Git credentials (bind a pre-configured .git-credentials at runtime)
 RUN git config --global credential.helper store \
     && echo "https://home-assistant-raspberry-pi:${GITHUB_TOKEN}@github.com" > /root/.git-credentials
