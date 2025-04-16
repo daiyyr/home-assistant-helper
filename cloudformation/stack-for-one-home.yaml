@@ -75,12 +75,6 @@ Resources:
                   - ssm:GetParameters
                 Resource: arn:aws:ssm:ap-southeast-2:654654455942:parameter/github/pat/home-assistant-config
 
-  HomeAssistantUserAccessKey:
-    Type: AWS::IAM::AccessKey
-    Properties:
-      UserName: !Ref HomeAssistantUser
-
-
   ECRRepository:
     Type: AWS::ECR::Repository
     Properties:
