@@ -17,14 +17,15 @@ ARG AWS_DEFAULT_REGION=ap-southeast-2
 ENV AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION
 
 # Install required packages
+# aws-cli via apk may fail on Alpine 3.21 (especially on arm64)
 RUN apk update && apk add --no-cache \
     bash \
     git \
-    aws-cli \
     cronie \
     openrc \
-    openssh
-
+    openssh \
+    && pip install awscli
+    
 # Create working directories
 RUN mkdir -p /opt/scripts \
     && mkdir -p /root/.cache
