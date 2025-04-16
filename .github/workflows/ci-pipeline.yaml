@@ -63,11 +63,11 @@ jobs:
         id: get_credentials
         run: |
           RawDockerUserAccessKeyId=$(aws cloudformation describe-stacks --stack-name home-assistant-${{ matrix.machine-nick-name }} --query "Stacks[0].Outputs[?OutputKey=='DockerUserAccessKeyId'].OutputValue" --output text)
-          Base64RawDockerUserAccessKeyId = $(echo -n $RawDockerUserAccessKeyId | base64 -w 0)
+          Base64RawDockerUserAccessKeyId=$(echo -n $RawDockerUserAccessKeyId | base64 -w 0)
           echo "DockerUserAccessKeyId=$Base64RawDockerUserAccessKeyId" >> $GITHUB_OUTPUT
 
           RawDockerUserSecretAccessKey=$(aws cloudformation describe-stacks --stack-name home-assistant-${{ matrix.machine-nick-name }} --query "Stacks[0].Outputs[?OutputKey=='DockerUserSecretAccessKey'].OutputValue" --output text)
-          Base64RawDockerUserSecretAccessKey = $(echo -n $RawDockerUserSecretAccessKey | base64 -w 0)
+          Base64RawDockerUserSecretAccessKey=$(echo -n $RawDockerUserSecretAccessKey | base64 -w 0)
           echo "DockerUserSecretAccessKey=$Base64RawDockerUserSecretAccessKey" >> $GITHUB_OUTPUT
 
       - name: Build docker image home-assistant-helper-${{ matrix.machine-nick-name }}
