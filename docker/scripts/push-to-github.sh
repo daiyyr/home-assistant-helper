@@ -6,6 +6,7 @@ mkdir -p /homeassistant/home-assistant-config/$MachineNickName
 cd /homeassistant/home-assistant-config
 git pull
 cp ../*.yaml ./$MachineNickName/
+cp ../esphome ./$MachineNickName/
 
 if [[ -n $(git status --porcelain) ]]; then
     git add .
