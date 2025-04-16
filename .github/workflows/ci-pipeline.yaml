@@ -75,6 +75,7 @@ jobs:
           DOCKER_USER_AWS_ACCESS_KEY_ID=`echo -n ${{steps.get_credentials.outputs.DockerUserAccessKeyId}} | base64 --decode`
           DOCKER_USER_AWS_SECRET_ACCESS_KEY=`echo -n ${{steps.get_credentials.outputs.DockerUserSecretAccessKey}} | base64 --decode`
           docker buildx build \
+            --platform linux/arm64
             --build-arg AWS_ACCESS_KEY_ID=$DOCKER_USER_AWS_ACCESS_KEY_ID \
             --build-arg AWS_SECRET_ACCESS_KEY=$DOCKER_USER_AWS_SECRET_ACCESS_KEY \
             --build-arg GITHUB_TOKEN=${{ secrets.home_assistance_config_github_pat }} \

@@ -18,7 +18,7 @@ aws configure
 machine_nickname=home
 aws ecr get-login-password --region ap-southeast-2 \
 | docker login --username AWS --password-stdin 654654455942.dkr.ecr.ap-southeast-2.amazonaws.com
-docker run -d --pull=always --cap-add=CAP_NET_RAW,CAP_NET_BIND_SERVICE --restart=unless-stopped -v /homeassistant:/homeassistant:Z -v /backup:/backup:Z 654654455942.dkr.ecr.ap-southeast-2.amazonaws.com/home-assistant-helper-$machine_nickname
+docker run -d --pull=always --restart=unless-stopped -v /homeassistant:/homeassistant:ro -v /backup:/backup:ro 654654455942.dkr.ecr.ap-southeast-2.amazonaws.com/home-assistant-helper-$machine_nickname
 ```
 
 

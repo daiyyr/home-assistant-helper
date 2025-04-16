@@ -26,28 +26,24 @@ RUN apk update && apk add --no-cache \
     openssh
 
 # Create working directories
-RUN mkdir -p /homeassistant/logs \
-    && mkdir -p /homeassistant/home-assistant-helper/scripts \
+RUN mkdir -p /opt/scripts \
     && mkdir -p /root/.cache
 
 # Copy local helper scripts into the correct location inside the container
-COPY scripts/* /homeassistant/home-assistant-helper/scripts/
-
-# Set the machine nickname
-RUN echo "$MACHINE_NICKNAME" > /homeassistant/machine_nickname.txt
+COPY scripts/* /opt/scripts/
 
 # Store Git credentials (bind a pre-configured .git-credentials at runtime)
 RUN git config --global credential.helper store \
     && echo "https://home-assistant-raspberry-pi:${GITHUB_TOKEN}@github.com" > /root/.git-credentials
 
 # Clone the Home Assistant config repo
-WORKDIR /homeassistant
+WORKDIR /opt
 RUN git clone https://github.com/daiyyr/home-assistant-config
 
 # Add cron jobs
-RUN echo "*/5 * * * * /homeassistant/home-assistant-helper/scripts/update-dns.sh >> /homeassistant/logs/update-dns.log 2>&1" >> /etc/crontabs/root \
-    && echo "0 3 * * 0 /homeassistant/home-assistant-helper/scripts/backup-to-s3.sh >> /homeassistant/logs/s3-backup.log 2>&1" >> /etc/crontabs/root \
-    && echo "*/3 * * * * /homeassistant/home-assistant-helper/scripts/push-to-github.sh >/dev/null 2>&1" >> /etc/crontabs/root
+RUN echo "*/5 * * * * /opt/scripts/update-dns.sh >> /var/log/update-dns.log 2>&1" >> /etc/crontabs/root \
+    && echo "0 3 * * 0 /opt/scripts/backup-to-s3.sh >> /var/log/s3-backup.log 2>&1" >> /etc/crontabs/root \
+    && echo "*/3 * * * * /opt/scripts/push-to-github.sh >/dev/null 2>&1" >> /etc/crontabs/root
 
 # Start crond in foreground
 CMD ["crond", "-f", "-l", "2"]

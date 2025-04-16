@@ -1,9 +1,8 @@
 #!/bin/bash
 
 R53HostedZoneId="Z06958611JDYVCG41K93R"
-MachineNickName=`cat /homeassistant/machine_nickname.txt`
 
-IP_FILE="/homeassistant/previous-ip.txt"
+IP_FILE="/opt/previous-ip.txt"
 mkdir -p "$(dirname "$IP_FILE")"
 
 # Read the previous IP from the file
@@ -24,7 +23,7 @@ if [ "$PUBLIC_IP" != "$PREVIOUS_IP" ]; then
         echo "R53HostedZoneId is unset"
     else
         DOMAIN_NAME=`aws route53 get-hosted-zone --id ${R53HostedZoneId} --query 'HostedZone.Name' --output text | sed 's/.$//'`
-        URL=${MachineNickName}.$DOMAIN_NAME
+        URL=${MACHINE_NICKNAME}.$DOMAIN_NAME
         aws route53 change-resource-record-sets --hosted-zone-id ${R53HostedZoneId} --change-batch '{"Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"'"$URL"'","Type":"A","TTL":10,"ResourceRecords":[{"Value":"'"$PUBLIC_IP"'"}]}}]}'
     fi
 
