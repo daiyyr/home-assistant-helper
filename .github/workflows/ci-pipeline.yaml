@@ -85,7 +85,7 @@ jobs:
           push: true
           tags: 654654455942.dkr.ecr.ap-southeast-2.amazonaws.com/home-assistant-helper-${{ matrix.machine-nick-name }}:latest
           build-args: |
-            GITHUB_TOKEN="${{ secrets.home_assistance_config_github_pat }}" \
+            GITHUB_TOKEN="${{ secrets.HOME_ASSISTANCE_CONFIG_GITHUB_PAT }}" \
             MACHINE_NICKNAME="${{ matrix.machine-nick-name }}" \
             AWS_ACCESS_KEY_ID="${{ steps.get_credentials.outputs.DockerUserAccessKeyId }}" \
             AWS_SECRET_ACCESS_KEY="${{ steps.get_credentials.outputs.DockerUserSecretAccessKey }}"
