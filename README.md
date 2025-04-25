@@ -1,28 +1,26 @@
-# Introduction
-- Regularly update R53 records to point to local machine public IP. Each machine use a different AWS user which can only update a specific DNS
+# Home Assistant Helper Setup Guide
+
+## Features
+- Regularly update R53 records to point to the machine's public IP
+- Each machine uses a separate AWS user with permissions that can only update a specific DNS record
 - Regularly upload Home Assistant backup files to s3
-- Regularly push Home Assistant config yaml files to github
+- Regularly push Home Assistant configuration yaml files to github
 
-# New machine setup
-- Update .github/workflows/ci-pipeline.yaml, add a new machine to deploy.strategy.matrix.machine-nick-name, e.g. home,home2,machine3,new_machine4. The Github workflow will be triggered to create a new cloud formation stack with aws resources for this machine.
-- Go to aws console to get AWS Secret Access Key and AWS Access Key ID from the new user home-assistant-{machine-nick-name}.
-- SSH to the new machine, install aws cli and configure AWS CLI with the above AWS credentials, and then start the cron job. Depending on the OS, you may need to use the relevant package manager to install the AWS CLI. Home Assistant Operating System for Raspberry Pi is based on Alpine Linux, so we use apk. Make sure to replace $MACHINE_NICKNAME with the value you defined earlier in the first step (deploy.strategy.matrix.machine-nick-name).
+## Setting up a New Machine
+### 1. Update GitHub Workflow
+Modify `.github/workflows/ci-pipeline.yaml` and add the new machine nickname under `deploy.strategy.matrix.machine-nick-name`. e.g. `home,home2,machine3,new_machine4`. Once pushed, the Github workflow will be triggered to create a new cloud formation stack with aws resources for this machine.
 
+### 2. Retrieve AWS Credentials
+In the AWS console, locate the newly created IAM user named `home-assistant-{machine-nick-name}`. Get AWS Secret Access Key and AWS Access Key ID from this user.
+
+### 3. Run Setup Script on the New Machine
+
+SSH into the new machine and run the setup script:
+
+```sh
+curl -O https://raw.githubusercontent.com/daiyyr/home-assistant-helper/main/scripts/install.sh
+chmod +x install.sh
+./setup-machine.sh `MACHINE_NICKNAME`
 ```
-export MACHINE_NICKNAME="home" # update this value for each machine
-
-apk add git cronie openrc aws-cli curl
-aws configure
-# enter AWS Secret Access Key and AWS Access Key ID from the previous step
-
-echo "$MACHINE_NICKNAME" > /opt/machine_nickname.txt
-git config --global user.name "$MACHINE_NICKNAME"
-git config --global user.email "$MACHINE_NICKNAME@the-alchemist.com"
-cd /opt
-git clone https://github.com/daiyyr/home-assistant-helper
-mkdir -p /root/.cache
-echo "*/5 * * * * /opt/home-assistant-helper/scripts/update-dns.sh >> /var/log/update-dns.log 2>&1" >> /etc/crontabs/root
-echo "0 3 * * 0 /opt/home-assistant-helper/scripts/backup-to-s3.sh >> /var/log/s3-backup.log 2>&1" >> /etc/crontabs/root
-echo "*/3 * * * * /opt/home-assistant-helper/scripts/push-to-github.sh >> /var/log/github-backup.log 2>&1" >> /etc/crontabs/root
-crond
-```
+Replace <MACHINE_NICKNAME> with the value you defined earlier in the first step, e.g. home2.  
+You will be prompted to enter AWS Access Key ID and Secret Access Key during the process, enter the one you get from the previous step.
