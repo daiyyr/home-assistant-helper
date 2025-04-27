@@ -17,19 +17,24 @@ DOMEAIN_NAME="the-alchemist.link"
 # Depending on the OS, you may need to use the relevant package manager to install the AWS CLI. Home Assistant Operating System for Raspberry Pi is based on Alpine Linux, so we use apk here
 apk add git cronie openrc aws-cli curl certbot certbot-dns-route53
 
+
 # Configure AWS CLI
-aws configure
 # You will be prompted to enter AWS Access Key ID, Secret Access Key, and region
+if [ ! -f "/root/.aws/credentials" ] || ! grep -q "aws_access_key_id" /root/.aws/credentials; then
+    aws configure
+fi
 
 # Set up git and machine nickname
 echo "$MACHINE_NICKNAME" > /opt/machine_nickname.txt
 git config --global user.name "$MACHINE_NICKNAME"
 git config --global user.email "$MACHINE_NICKNAME@$DOMEAIN_NAME"
 
+
 # Create certificate
 if [ ! -f "/etc/letsencrypt/live/$MACHINE_NICKNAME.$DOMEAIN_NAME/fullchain.pem" ]; then
     certbot certonly --dns-route53 -d $MACHINE_NICKNAME.$DOMEAIN_NAME --non-interactive --agree-tos
 fi
+
 
 # Clone the helper repo
 if [ -d "/opt/home-assistant-helper" ]; then
@@ -40,8 +45,10 @@ else
     git clone https://github.com/daiyyr/home-assistant-helper
 fi
 
+
 # Prepare cache directory
 mkdir -p /root/.cache
+
 
 # Add cron jobs
 if ! grep -q "update-dns.sh" /etc/crontabs/root; then
