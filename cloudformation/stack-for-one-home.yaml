@@ -32,8 +32,11 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                  - route53:GetHostedZone
                   - route53:ListHostedZones
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - route53:GetHostedZone
                 Resource: !Sub arn:aws:route53:::hostedzone/${HostedZoneId}
 
               - Effect: Allow
