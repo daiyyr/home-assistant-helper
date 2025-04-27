@@ -28,7 +28,7 @@ git config --global user.email "$MACHINE_NICKNAME@$DOMEAIN_NAME"
 
 # Create certificate
 if [ ! -f "/etc/letsencrypt/live/$MACHINE_NICKNAME.$DOMEAIN_NAME/fullchain.pem" ]; then
-    certbot certonly --dns-route53 -d $MACHINE_NICKNAME.$DOMEAIN_NAME --non-interactive --agree-tos --dns-route53-propagation-seconds 30
+    certbot certonly --dns-route53 -d $MACHINE_NICKNAME.$DOMEAIN_NAME --non-interactive --agree-tos
 fi
 
 # Clone the helper repo
