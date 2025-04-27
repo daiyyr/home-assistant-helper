@@ -33,7 +33,8 @@ Resources:
               - Effect: Allow
                 Action:
                   - route53:GetHostedZone
-                Resource: '*'
+                  - route53:ListHostedZones
+                Resource: !Sub arn:aws:route53:::hostedzone/${HostedZoneId}
 
               - Effect: Allow
                 Action: route53:ChangeResourceRecordSets
