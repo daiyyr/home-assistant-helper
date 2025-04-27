@@ -14,8 +14,8 @@ mkdir -p /opt/home-assistant-config/$MACHINE_NICKNAME
 cd /opt/home-assistant-config
 git pull
 
-cp /homeassistant/*.yaml ./$MACHINE_NICKNAME/
-cp -R /homeassistant/esphome ./$MACHINE_NICKNAME/
+cp /homeassistant/*.yaml /opt/home-assistant-config/$MACHINE_NICKNAME/
+cp -R /homeassistant/esphome /opt/home-assistant-config/$MACHINE_NICKNAME/
 # maybe add more folder here in the future
 
 

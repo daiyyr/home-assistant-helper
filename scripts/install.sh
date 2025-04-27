@@ -32,7 +32,10 @@ git config --global user.email "$MACHINE_NICKNAME@$DOMEAIN_NAME"
 
 # Create certificate
 if [ ! -f "/etc/letsencrypt/live/$MACHINE_NICKNAME.$DOMEAIN_NAME/fullchain.pem" ]; then
-    certbot certonly --dns-route53 -d $MACHINE_NICKNAME.$DOMEAIN_NAME --non-interactive --agree-tos
+    certbot certonly --dns-route53 -d $MACHINE_NICKNAME.$DOMEAIN_NAME --non-interactive --agree-tos --register-unsafely-without-email
+    mkdir -p /config/ssl
+    ln -s /etc/letsencrypt/live/$MACHINE_NICKNAME.$DOMEAIN_NAME/fullchain.pem /config/ssl/fullchain.pem
+    ln -s /etc/letsencrypt/live/$MACHINE_NICKNAME.$DOMEAIN_NAME/privkey.pem /config/ssl/privkey.pem
 fi
 
 
