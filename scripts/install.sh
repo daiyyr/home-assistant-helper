@@ -70,4 +70,6 @@ if ! grep -q "certbot" /etc/crontabs/root; then
 fi
 
 # Start cron daemon
-crond
+if ! pgrep -x "crond" > /dev/null; then
+    crond
+fi
