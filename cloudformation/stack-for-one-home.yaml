@@ -43,7 +43,7 @@ Resources:
                   StringLike:
                     "route53:ChangeResourceRecordSetsNormalizedRecordNames":
                       - !Sub "${MachineNickName}.${SecondLevelDomainName}"
-                      - !Sub "_acme-challenge.${MachineNickName}.*.${SecondLevelDomainName}"
+                      - !Sub "_acme-challenge.${MachineNickName}.${SecondLevelDomainName}"
                     "route53:ChangeResourceRecordSetsActions":
                       - CREATE
                       - UPSERT
