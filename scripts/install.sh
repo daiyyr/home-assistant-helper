@@ -31,7 +31,7 @@ git config --global user.email "$MACHINE_NICKNAME@$DOMEAIN_NAME"
 
 
 # Create certificate
-if [ ! -f "/etc/letsencrypt/live/$MACHINE_NICKNAME.$DOMEAIN_NAME/fullchain.pem" ]; then
+if [ ! -f "/config/ssl/fullchain.pem" ]; then
     certbot certonly --dns-route53 -d $MACHINE_NICKNAME.$DOMEAIN_NAME --non-interactive --agree-tos --register-unsafely-without-email
     cp /etc/letsencrypt/live/$MACHINE_NICKNAME.$DOMEAIN_NAME/fullchain.pem /config/ssl/fullchain.pem
     cp /etc/letsencrypt/live/$MACHINE_NICKNAME.$DOMEAIN_NAME/privkey.pem /config/ssl/privkey.pem
@@ -65,7 +65,7 @@ if ! grep -q "push-to-github.sh" /etc/crontabs/root; then
     echo "*/3 * * * * /opt/home-assistant-helper/scripts/push-to-github.sh >> /var/log/github-backup.log 2>&1" >> /etc/crontabs/root
 fi
 if ! grep -q "certbot" /etc/crontabs/root; then
-    echo '0 2 * * * certbot renew --quiet && cp /etc/letsencrypt/live/$MACHINE_NICKNAME.$DOMEAIN_NAME/fullchain.pem /config/ssl/fullchain.pem && cp /etc/letsencrypt/live/$MACHINE_NICKNAME.$DOMEAIN_NAME/privkey.pem /config/ssl/privkey.pem && chmod 644 /config/ssl/fullchain.pem && chmod 644 /config/ssl/privkey.pem' >> /etc/crontabs/root
+    echo '0 2 * * * certbot renew --quiet && cp /etc/letsencrypt/live/$MACHINE_NICKNAME.$DOMEAIN_NAME/fullchain.pem /config/ssl/fullchain.pem && cp /etc/letsencrypt/live/$MACHINE_NICKNAME.$DOMEAIN_NAME/privkey.pem /config/ssl/privkey.pem && chmod 644 /config/ssl/fullchain.pem && chmod 644 /config/ssl/privkey.pem && ha core restart' >> /etc/crontabs/root
 fi
 
 # Start cron daemon
