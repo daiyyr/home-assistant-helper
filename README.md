@@ -1,26 +1,31 @@
-# Home Assistant Helper Setup Guide
+# Home Assistant Helper
 
 ## Features
-- Regularly update R53 records to point to the machine's public IP
-- Each machine uses a separate AWS user with permissions that can only update a specific DNS record
-- Regularly upload Home Assistant backup files to s3
-- Regularly push Home Assistant configuration yaml files to github
+- Automatically request/renew certs from letsencrypt
+- Automatically update R53 records to point to the machine's public IP
+- Automatically upload Home Assistant backup files to s3
+- Automatically push Home Assistant configuration yaml files to github
+- Each machine uses a dedicated AWS user with granular permissions to update a specific DNS record and access a defined S3 bucket path
 
-## Setting up a New Machine
+## Setting up a New Home
 ### 1. Update GitHub Workflow
 Modify `.github/workflows/ci-pipeline.yaml` and add the new machine nickname under `deploy.strategy.matrix.machine-nick-name`. e.g. `home,home2,machine3,new_machine4`. Once pushed, the Github workflow will be triggered to create a new cloud formation stack with aws resources for this machine.
 
 ### 2. Retrieve AWS Credentials
 In the AWS console, locate the newly created IAM user named `home-assistant-{machine-nick-name}`. Get AWS Secret Access Key and AWS Access Key ID from this user.
 
-### 3. Run Setup Script on the New Machine
-
-SSH into the new machine and run the setup script:
-
+### 3. Run Setup Script
+SSH into the new Raspberry Pi and run:
 ```sh
 MACHINE_NICKNAME="home" # Replace "home" with the value you defined earlier in the first step, e.g. home2.  
 curl -O https://raw.githubusercontent.com/daiyyr/home-assistant-helper/main/scripts/install.sh
 chmod +x install.sh
 ./install.sh "$MACHINE_NICKNAME"
 ```
-You will be prompted to enter AWS Access Key ID and Secret Access Key during the process, enter the one you get from the previous step.
+You’ll be prompted for the AWS credentials from step 2.
+
+## Recovery After Power Outage
+```sh
+docker rm homeassistant
+ha core start
+```
