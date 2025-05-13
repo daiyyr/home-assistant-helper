@@ -18,9 +18,9 @@ In the AWS console, locate the newly created IAM user named `home-assistant-{mac
 SSH into the new machine and run the setup script:
 
 ```sh
+MACHINE_NICKNAME="home" # Replace "home" with the value you defined earlier in the first step, e.g. home2.  
 curl -O https://raw.githubusercontent.com/daiyyr/home-assistant-helper/main/scripts/install.sh
 chmod +x install.sh
-./install.sh `MACHINE_NICKNAME`
+./install.sh "$MACHINE_NICKNAME"
 ```
-Replace <MACHINE_NICKNAME> with the value you defined earlier in the first step, e.g. home2.  
 You will be prompted to enter AWS Access Key ID and Secret Access Key during the process, enter the one you get from the previous step.
