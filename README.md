@@ -14,8 +14,11 @@ Modify `.github/workflows/ci-pipeline.yaml` and add the new machine nickname und
 ### 2. Retrieve AWS Credentials
 In the AWS console, locate the newly created IAM user named `home-assistant-{machine-nick-name}`. Get AWS Secret Access Key and AWS Access Key ID from this user.
 
-### 3. Run Setup Script
-SSH into the new Raspberry Pi and run:
+### 3. Install OS
+Follow the official instruction to install the HA OS in your Raspberrypi: https://www.home-assistant.io/installation/raspberrypi
+
+### 4. Run Setup Script
+SSH into the new Raspberry Pi OS and run:
 ```sh
 MACHINE_NICKNAME="home" # Replace "home" with the value you defined earlier in the first step, e.g. home2.  
 curl -O https://raw.githubusercontent.com/daiyyr/home-assistant-helper/main/scripts/install.sh
@@ -23,6 +26,14 @@ chmod +x install.sh
 ./install.sh "$MACHINE_NICKNAME"
 ```
 You’ll be prompted for the AWS credentials from step 2.
+
+### 5. Specify certificate and key path
+Add below in HA /homeassistant/configuration.yaml and restart HA
+```yaml
+http:
+   ssl_certificate: /config/ssl/fullchain.pem
+   ssl_key: /config/ssl/privkey.pem
+```
 
 ## Recovery After Power Outage
 ```sh
