@@ -16,6 +16,7 @@ git pull
 
 cp /homeassistant/*.yaml /opt/home-assistant-config/$MACHINE_NICKNAME/
 cp -R /homeassistant/esphome /opt/home-assistant-config/$MACHINE_NICKNAME/
+cp /homeassistant/.storage/lovelace* /opt/home-assistant-config/$MACHINE_NICKNAME/.storage/ # dashboards config
 # maybe add more folder here in the future
 
 
