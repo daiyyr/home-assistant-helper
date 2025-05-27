@@ -11,6 +11,7 @@ if [ ! -d "/opt/home-assistant-config" ]; then
 fi
 
 mkdir -p /opt/home-assistant-config/$MACHINE_NICKNAME
+mkdir -p /opt/home-assistant-config/$MACHINE_NICKNAME/.storage/
 cd /opt/home-assistant-config
 git pull
 
