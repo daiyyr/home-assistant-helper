@@ -15,8 +15,7 @@ DOMEAIN_NAME="the-alchemist.link"
 
 # Install required packages. 
 # Depending on the OS, you may need to use the relevant package manager to install the AWS CLI. Home Assistant Operating System for Raspberry Pi is based on Alpine Linux, so we use apk here
-apk add git cronie openrc aws-cli curl certbot certbot-dns-route53
-
+apk add git cronie openrc aws-cli curl certbot certbot-dns-route53 inotify-tools
 
 # Configure AWS CLI
 # You will be prompted to enter AWS Access Key ID, Secret Access Key, and region
@@ -50,9 +49,14 @@ else
 fi
 
 
-# Prepare cache directory
+# Prepare directory
 mkdir -p /root/.cache
+mkdir -p /opt/reolink
 
+# start reolink-to-s3.sh
+if ! pgrep -f "reolink-to-s3.sh" > /dev/null; then
+    /opt/home-assistant-helper/scripts/reolink-to-s3.sh >> /var/log/reolink-watch.log 2>&1 &
+fi
 
 # Add cron jobs
 if ! grep -q "update-dns.sh" /etc/crontabs/root; then
@@ -60,9 +64,6 @@ if ! grep -q "update-dns.sh" /etc/crontabs/root; then
 fi
 if ! grep -q "backup-to-s3.sh" /etc/crontabs/root; then
     echo "0 3 * * 0 /opt/home-assistant-helper/scripts/backup-to-s3.sh >> /var/log/s3-backup.log 2>&1" >> /etc/crontabs/root
-fi
-if ! grep -q "reolink-to-s3.sh" /etc/crontabs/root; then
-    echo "30 6 * * * /opt/home-assistant-helper/scripts/reolink-to-s3.sh >> /var/log/reolink-backup.log 2>&1" >> /etc/crontabs/root
 fi
 if ! grep -q "push-to-github.sh" /etc/crontabs/root; then
     echo "*/3 * * * * /opt/home-assistant-helper/scripts/push-to-github.sh >> /var/log/github-backup.log 2>&1" >> /etc/crontabs/root

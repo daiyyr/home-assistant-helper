@@ -1,22 +1,20 @@
 #!/bin/bash
 
-# Load machine nickname
 MACHINE_NICKNAME=$(cat /opt/machine_nickname.txt)
+WATCH_DIR="/opt/reolink"
 
-# Create timestamp
-TIMESTAMP=$(date +%Y%m%d)
-
-# Define paths
-ZIP_FILE="/media/reolink_${TIMESTAMP}.zip"
-REOLINK_DIR="/media/reolink"
-
-# Zip the /media/reolink folder contents (without including the top-level folder itself)
-cd "$REOLINK_DIR"
-zip -r "$ZIP_FILE" ./*
-
-# Upload the zip to S3
-aws s3 cp "$ZIP_FILE" s3://the-alchemist-home-assistant/$MACHINE_NICKNAME/media/reolink_${TIMESTAMP}.zip
-
-# Remove all files and subfolders inside /media/reolink but keep the folder itself
-rm -rf "$REOLINK_DIR"/* "$REOLINK_DIR"/.??*
-rm -rf "$ZIP_FILE"
+inotifywait -m -r -e close_write,moved_to,create "$WATCH_DIR" --format '%w%f' | while read NEWFILE
+do
+    if [ -f "$NEWFILE" ]; then
+        REL_PATH="${NEWFILE#$WATCH_DIR/}"
+        S3_PATH="s3://the-alchemist-home-assistant/$MACHINE_NICKNAME/reolink/$REL_PATH"
+        # echo "$(date +%Y%m%d_%H%M%S): Detected file $NEWFILE, uploading to $S3_PATH"
+        
+        if aws s3 cp "$NEWFILE" "$S3_PATH"; then
+            # echo "$(date +%Y%m%d_%H%M%S): Upload successful, deleting $NEWFILE"
+            rm -f "$NEWFILE"
+        else
+            echo "$(date +%Y%m%d_%H%M%S): Upload failed, keeping $NEWFILE"
+        fi
+    fi
+done
