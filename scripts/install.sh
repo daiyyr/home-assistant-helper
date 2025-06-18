@@ -61,6 +61,9 @@ fi
 if ! grep -q "backup-to-s3.sh" /etc/crontabs/root; then
     echo "0 3 * * 0 /opt/home-assistant-helper/scripts/backup-to-s3.sh >> /var/log/s3-backup.log 2>&1" >> /etc/crontabs/root
 fi
+if ! grep -q "reolink-to-s3.sh" /etc/crontabs/root; then
+    echo "30 6 * * * /opt/home-assistant-helper/scripts/reolink-to-s3.sh >> /var/log/reolink-backup.log 2>&1" >> /etc/crontabs/root
+fi
 if ! grep -q "push-to-github.sh" /etc/crontabs/root; then
     echo "*/3 * * * * /opt/home-assistant-helper/scripts/push-to-github.sh >> /var/log/github-backup.log 2>&1" >> /etc/crontabs/root
 fi
