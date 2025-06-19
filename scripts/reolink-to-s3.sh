@@ -1,7 +1,7 @@
 #!/bin/bash
 
 MACHINE_NICKNAME=$(cat /opt/machine_nickname.txt)
-WATCH_DIR="/opt/reolink"
+WATCH_DIR="/media/reolink"
 
 inotifywait -m -r -e close_write,moved_to,create "$WATCH_DIR" --format '%w%f' | while read NEWFILE
 do

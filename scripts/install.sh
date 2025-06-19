@@ -51,7 +51,7 @@ fi
 
 # Prepare directory
 mkdir -p /root/.cache
-mkdir -p /opt/reolink
+mkdir -p /media/reolink
 
 # start reolink-to-s3.sh
 if ! pgrep -f "reolink-to-s3.sh" > /dev/null; then
