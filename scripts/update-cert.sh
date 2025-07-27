@@ -22,3 +22,5 @@ cp /etc/letsencrypt/live/$MACHINE_NICKNAME.$DOMEAIN_NAME/fullchain.pem /config/s
 cp /etc/letsencrypt/live/$MACHINE_NICKNAME.$DOMEAIN_NAME/privkey.pem /config/ssl/privkey.pem
 chmod 644 /config/ssl/fullchain.pem
 chmod 644 /config/ssl/privkey.pem
+
+ha core restart
