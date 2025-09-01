@@ -37,7 +37,7 @@ do
         
         # create the zip (store just the file inside the ZIP)
         if zip -j -q -- "$ZIP_PATH" "$NEWFILE"; then
-            if aws s3 cp -- "$ZIP_PATH" "$S3_ZIP_PATH"; then
+            if aws s3 cp --no-progress --only-show-errors -- "$ZIP_PATH" "$S3_ZIP_PATH"; then
                 # on success, remove both the original and the zip
                 rm -f -- "$NEWFILE" "$ZIP_PATH"
             else

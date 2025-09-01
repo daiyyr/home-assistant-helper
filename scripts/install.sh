@@ -54,10 +54,26 @@ mkdir -p /root/.cache
 mkdir -p /media/reolink
 mkdir -p /media/reolink_front
 
+
 # start reolink-to-s3.sh
-if ! pgrep -f "reolink-to-s3.sh" > /dev/null; then
-    /opt/home-assistant-helper/scripts/reolink-to-s3.sh >> /var/log/reolink-watch.log 2>&1 &
+TARGET="/opt/home-assistant-helper/scripts/reolink-to-s3.sh"
+LOG="/var/log/reolink-watch.log"
+# Stop existing instance(s)
+if pgrep -f -- "$TARGET" >/dev/null; then
+  echo "Stopping old instance(s)..."
+  pkill -TERM -f -- "$TARGET" || true          # ask nicely
+  for _ in {1..20}; do                          # wait up to ~10s
+    sleep 0.5
+    pgrep -f -- "$TARGET" >/dev/null || break
+  done
+  pgrep -f -- "$TARGET" >/dev/null && pkill -KILL -f -- "$TARGET" || true
 fi
+# Start fresh
+echo "Starting: $TARGET"
+nohup "$TARGET" >> "$LOG" 2>&1 & disown
+echo "PID: $!"
+
+
 
 # Add cron jobs
 if ! grep -q "update-dns.sh" /etc/crontabs/root; then
