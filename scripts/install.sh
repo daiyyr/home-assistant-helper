@@ -40,13 +40,9 @@ fi
 
 
 # Clone the helper repo
-if [ -d "/opt/home-assistant-helper" ]; then
-    cd /opt/home-assistant-helper
-    git pull
-else
-    cd /opt
-    git clone https://github.com/daiyyr/home-assistant-helper
-fi
+cd /opt
+rm -rf /opt/home-assistant-helper
+git clone https://github.com/daiyyr/home-assistant-helper
 
 
 # Prepare directory
