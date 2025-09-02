@@ -70,7 +70,7 @@ if pgrep -f -- "$TARGET" >/dev/null; then
 fi
 # Start fresh
 echo "Starting: $TARGET"
-nohup "$TARGET" >> "$LOG" 2>&1 &
+"$TARGET" >> "$LOG" 2>&1 &
 echo "PID: $!"
 
 
