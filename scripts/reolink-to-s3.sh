@@ -28,17 +28,20 @@ do
         REL_PATH="${NEWFILE#$BASE_WATCH_DIR/}"       # path under the matched watch dir
         WATCH_NAME="$(basename -- "$BASE_WATCH_DIR")" # e.g. reolink, reolink_frontdoor, reolink_garden
         FILENAME="$(basename -- "$NEWFILE")"    # e.g. clip_001.mp4
-        ZIP_PATH="/tmp/${FILENAME}.zip" # e.g. /tmp/clip_001.mp4.zip
+        TEMP_FILE="/tmp/${FILENAME}"
+        ZIP_PATH="${TEMP_FILE}.zip" # e.g. /tmp/clip_001.mp4.zip
         S3_ZIP_PATH="${BUCKET}/${MACHINE_NICKNAME}/${WATCH_NAME}/${REL_PATH}.zip"
         
         # start fresh so zip doesn't update/append
         rm -f -- "$ZIP_PATH"
         
         # create the zip (store just the file inside the ZIP)
-        if zip -j -q "$ZIP_PATH" "$NEWFILE"; then
+        mv "$NEWFILE" "$TEMP_FILE"
+        if zip -j -q "$ZIP_PATH" "$TEMP_FILE"; then
+            sync "$ZIP_PATH"
             if aws s3 mv --no-progress --only-show-errors -- "$ZIP_PATH" "$S3_ZIP_PATH"; then
-                # on success, remove both the original and the zip
-                rm -f -- "$NEWFILE"
+                # on success, remove TEMP_FILE
+                rm -f -- "$TEMP_FILE"
             else
                 echo "$(date +%Y%m%d_%H%M%S): Upload failed for $ZIP_PATH -> $S3_ZIP_PATH, keeping files"
             fi
