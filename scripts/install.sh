@@ -61,12 +61,14 @@ LOG="/var/log/reolink-watch.log"
 # Stop existing instance(s)
 if pgrep -f -- "$TARGET" >/dev/null; then
   echo "Stopping old instance(s)..."
-  pkill -TERM -f -- "$TARGET" || true          # ask nicely
-  for _ in {1..20}; do                          # wait up to ~10s
-    sleep 0.5
-    pgrep -f -- "$TARGET" >/dev/null || break
-  done
-  pgrep -f -- "$TARGET" >/dev/null && pkill -KILL -f -- "$TARGET" || true
+  # Kill the parent and all its children
+  pkill -TERM -P "$(pgrep -f "$TARGET")" || true
+  pkill -TERM -f -- "$TARGET" || true
+  pkill -TERM -f inotifywait || true
+  sleep 2
+  pkill -KILL -P "$(pgrep -f "$TARGET")" || true
+  pkill -KILL -f -- "$TARGET" || true
+  pkill -KILL -f inotifywait || true
 fi
 # Start fresh
 echo "Starting: $TARGET"
