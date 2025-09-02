@@ -28,8 +28,7 @@ do
         REL_PATH="${NEWFILE#$BASE_WATCH_DIR/}"       # path under the matched watch dir
         WATCH_NAME="$(basename -- "$BASE_WATCH_DIR")" # e.g. reolink, reolink_frontdoor, reolink_garden
         FILENAME="$(basename -- "$NEWFILE")"    # e.g. clip_001.mp4
-        ZIP_PATH="/tmp/${REL_PATH}.zip" # e.g. /tmp/clip_001.mp4.zip
-        S3_BASE="s3://the-alchemist-home-assistant/$MACHINE_NICKNAME/reolink/$REL_PATH"
+        ZIP_PATH="/tmp/${FILENAME}.zip" # e.g. /tmp/clip_001.mp4.zip
         S3_ZIP_PATH="${BUCKET}/${MACHINE_NICKNAME}/${WATCH_NAME}/${REL_PATH}.zip"
         
         # start fresh so zip doesn't update/append
