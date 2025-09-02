@@ -59,15 +59,17 @@ mkdir -p /media/reolink_front
 TARGET="/opt/home-assistant-helper/scripts/reolink-to-s3.sh"
 LOG="/var/log/reolink-watch.log"
 # Stop existing instance(s)
-if pgrep -f -- "$TARGET" >/dev/null; then
+PIDS=$(pgrep -f "$TARGET" || true)
+if [ -n "$PIDS" ]; then
   echo "Stopping old instance(s)..."
-  # Kill the parent and all its children
-  pkill -TERM -P "$(pgrep -f "$TARGET")" || true
-  pkill -TERM -f -- "$TARGET" || true
+  for PID in $PIDS; do
+    pkill -TERM -P $PID || true
+    sleep 1
+    pkill -KILL -P $PID || true
+  done
+  # clean up any straggler inotifywait processes
   pkill -TERM -f inotifywait || true
-  sleep 2
-  pkill -KILL -P "$(pgrep -f "$TARGET")" || true
-  pkill -KILL -f -- "$TARGET" || true
+  sleep 1
   pkill -KILL -f inotifywait || true
 fi
 # Start fresh
