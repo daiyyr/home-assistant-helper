@@ -41,7 +41,8 @@ do
             sync "$ZIP_PATH"
             if aws s3 mv --no-progress --only-show-errors -- "$ZIP_PATH" "$S3_ZIP_PATH"; then
                 # on success, remove TEMP_FILE
-                rm -f -- "$TEMP_FILE"
+                # rm -f -- "$TEMP_FILE"
+                echo "succeed"
             else
                 echo "$(date +%Y%m%d_%H%M%S): Upload failed for $ZIP_PATH -> $S3_ZIP_PATH, keeping files"
             fi
