@@ -87,7 +87,7 @@ if ! grep -q "push-to-github.sh" /etc/crontabs/root; then
     echo "*/3 * * * * /opt/home-assistant-helper/scripts/push-to-github.sh >> /var/log/github-backup.log 2>&1" >> /etc/crontabs/root
 fi
 if ! grep -q "certbot" /etc/crontabs/root; then
-    echo "0 2 1 * * /opt/home-assistant-helper/scripts/update-cert.sh \"$MACHINE_NICKNAME\"" >> /etc/crontabs/root
+    echo "0 2 1 * * /opt/home-assistant-helper/scripts/update-cert.sh $MACHINE_NICKNAME" >> /etc/crontabs/root
 fi
 
 # Start cron daemon
