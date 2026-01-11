@@ -49,7 +49,8 @@ git clone https://github.com/daiyyr/home-assistant-helper
 mkdir -p /root/.cache
 mkdir -p /media/reolink
 mkdir -p /media/reolink_front
-
+mkdir -p /media/reolink_roberts_front
+mkdir -p /media/reolink_roberts_garden
 
 # start reolink-to-s3.sh
 TARGET="/opt/home-assistant-helper/scripts/reolink-to-s3.sh"
