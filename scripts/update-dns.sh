@@ -1,6 +1,7 @@
 #!/bin/bash
 MACHINE_NICKNAME=`cat /opt/machine_nickname.txt`
 R53HostedZoneId="Z06958611JDYVCG41K93R"
+R53HostedZoneId_for_mail="Z0418706D4R5AHFWGBQ9"
 
 IP_FILE="/opt/previous-ip.txt"
 mkdir -p "$(dirname "$IP_FILE")"
@@ -25,6 +26,10 @@ if [ "$PUBLIC_IP" != "$PREVIOUS_IP" ]; then
         DOMAIN_NAME=`aws route53 get-hosted-zone --id ${R53HostedZoneId} --query 'HostedZone.Name' --output text | sed 's/.$//'`
         URL=${MACHINE_NICKNAME}.$DOMAIN_NAME
         aws route53 change-resource-record-sets --hosted-zone-id ${R53HostedZoneId} --change-batch '{"Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"'"$URL"'","Type":"A","TTL":10,"ResourceRecords":[{"Value":"'"$PUBLIC_IP"'"}]}}]}'
+        
+        MAIL_DOMAIN=`aws route53 get-hosted-zone --id ${R53HostedZoneId_for_mail} --query "HostedZone.Name" --output text`
+        MAIL_DOMAIN_NAME=mail.$MAIL_DOMAIN
+        aws route53 change-resource-record-sets --hosted-zone-id ${R53HostedZoneId_for_mail} --change-batch '{"Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"'"$MAIL_DOMAIN_NAME"'","Type":"A","TTL":10,"ResourceRecords":[{"Value":"'"$PUBLIC_IP"'"}]}}]}'
     fi
 
   # Save the new IP for future comparisons

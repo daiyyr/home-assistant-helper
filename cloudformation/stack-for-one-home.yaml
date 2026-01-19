@@ -14,6 +14,10 @@ Parameters:
     Type: String
     Description: Route 53 Hosted Zone ID
     Default: Z06958611JDYVCG41K93R
+  HostedZoneId2:
+    Type: String
+    Description: Another Route 53 Hosted Zone ID
+    Default: Z0418706D4R5AHFWGBQ9
   SecondLevelDomainName:
     Type: String
     Description: SLD, the domain name you registered
@@ -35,14 +39,32 @@ Resources:
                   - route53:ListHostedZones
                   - route53:GetChange
                 Resource: "*"
+                
               - Effect: Allow
                 Action:
                   - route53:GetHostedZone
                 Resource: !Sub arn:aws:route53:::hostedzone/${HostedZoneId}
 
               - Effect: Allow
+                Action:
+                  - route53:GetHostedZone
+                Resource: !Sub arn:aws:route53:::hostedzone/${HostedZoneId2}
+
+              - Effect: Allow
                 Action: route53:ChangeResourceRecordSets
                 Resource: !Sub arn:aws:route53:::hostedzone/${HostedZoneId}
+                Condition:
+                  StringLike:
+                    "route53:ChangeResourceRecordSetsNormalizedRecordNames":
+                      - !Sub "${MachineNickName}.${SecondLevelDomainName}"
+                      - !Sub "_acme-challenge.${MachineNickName}.${SecondLevelDomainName}"
+                    "route53:ChangeResourceRecordSetsActions":
+                      - CREATE
+                      - UPSERT
+
+              - Effect: Allow
+                Action: route53:ChangeResourceRecordSets
+                Resource: !Sub arn:aws:route53:::hostedzone/${HostedZoneId2}
                 Condition:
                   StringLike:
                     "route53:ChangeResourceRecordSetsNormalizedRecordNames":
