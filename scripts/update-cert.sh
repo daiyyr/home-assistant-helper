@@ -29,8 +29,8 @@ if [ "$MACHINE_NICKNAME" == "home" ]; then
     MAIL_DOMAIN=`aws route53 get-hosted-zone --id ${R53HostedZoneId_for_mail} --query "HostedZone.Name" --output text`
     MAIL_DOMAIN=${MAIL_DOMAIN%.}
     MAIL_DOMAIN_NAME=mail.$MAIL_DOMAIN
-    if [ ! -f "/etc/letsencrypt/live/mail.$MAIL_DOMAIN_NAME/fullchain.pem" ]; then
-        certbot certonly --dns-route53 -d mail.$MAIL_DOMAIN_NAME --non-interactive --agree-tos --register-unsafely-without-email
+    if [ ! -f "/etc/letsencrypt/live/$MAIL_DOMAIN_NAME/fullchain.pem" ]; then
+        certbot certonly --dns-route53 -d $MAIL_DOMAIN_NAME --non-interactive --agree-tos --register-unsafely-without-email
     fi
 fi
 
