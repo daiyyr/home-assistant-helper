@@ -40,6 +40,7 @@ postconf -e "smtpd_sasl_auth_enable = yes"
 postconf -e "smtpd_sasl_type = dovecot"
 postconf -e "smtpd_sasl_path = private/auth"
 postconf -e "virtual_transport = lmtp:unix:private/dovecot-lmtp"
+postconf -e "smtpd_relay_restrictions = permit_mynetworks, permit_sasl_authenticated, reject_unauth_destination"
 
 
 BLOCK_MARKER="## Gmail submission block"
@@ -48,12 +49,17 @@ BLOCK_MARKER="## Gmail submission block"
 if ! grep -q "$BLOCK_MARKER" /etc/postfix/master.cf; then
   echo "$BLOCK_MARKER" | sudo tee -a /etc/postfix/master.cf
   sudo tee -a /etc/postfix/master.cf > /dev/null <<'EOF'
-submission inet n       -       n       -       -       smtpd
-  -o syslog_name=postfix/submission
+submission inet n - n - - smtpd
   -o smtpd_tls_security_level=encrypt
   -o smtpd_sasl_auth_enable=yes
-  -o smtpd_tls_auth_only=yes
-  -o smtpd_recipient_restrictions=permit_sasl_authenticated,reject
+  -o smtpd_sasl_type=dovecot
+  -o smtpd_sasl_path=private/auth
+  -o smtpd_sasl_security_options=noanonymous
+  -o smtpd_sasl_local_domain=$myhostname
+  -o smtpd_client_restrictions=permit_sasl_authenticated,reject
+  -o smtpd_sender_login_maps=hash:/etc/postfix/virtual
+  -o smtpd_sender_restrictions=reject_sender_login_mismatch
+  -o smtpd_recipient_restrictions=reject_non_fqdn_recipient,reject_unknown_recipient_domain,permit_sasl_authenticated,reject
 EOF
 fi
 
@@ -125,7 +131,7 @@ chown -R $EMAIL_USER:$EMAIL_USER /home/$EMAIL_USER/Maildir
 
 # === Start Postfix (still OpenRC optional) ===
 if ! pgrep -x master >/dev/null 2>&1; then
-    /usr/sbin/postfix start
+    postfix start
 fi
 
 # === Start Dovecot manually if not running ===
