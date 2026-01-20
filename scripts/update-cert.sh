@@ -23,8 +23,6 @@ cp /etc/letsencrypt/live/$MACHINE_NICKNAME.$DOMEAIN_NAME/privkey.pem /config/ssl
 chmod 644 /config/ssl/fullchain.pem
 chmod 644 /config/ssl/privkey.pem
 
-ha core restart
-
 # Update mail certificate if this is the main home machine
 if [ "$MACHINE_NICKNAME" == "home" ]; then
     MAIL_DOMAIN=`aws route53 get-hosted-zone --id ${R53HostedZoneId_for_mail} --query "HostedZone.Name" --output text`
@@ -34,3 +32,5 @@ if [ "$MACHINE_NICKNAME" == "home" ]; then
         certbot certonly --dns-route53 -d mail.$MAIL_DOMAIN_NAME --non-interactive --agree-tos --register-unsafely-without-email
     fi
 fi
+
+# ha core restart
