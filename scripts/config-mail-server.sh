@@ -15,7 +15,7 @@ echo "=== Updating system ==="
 apk update && apk upgrade
 
 echo "=== Installing packages ==="
-apk add --no-cache postfix dovecot openssl certbot shadow
+apk add --no-cache postfix dovecot openssl certbot shadow dovecot-lmtpd
 
 echo "=== Create /etc/dovecot dir if missing ==="
 mkdir -p /etc/dovecot
