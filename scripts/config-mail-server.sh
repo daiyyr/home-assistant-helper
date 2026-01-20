@@ -115,6 +115,9 @@ service auth {
   }
 }
 
+# Outlook and Windows Mail works only with LOGIN mechanism, not the
+# standard PLAIN
+auth_mechanisms = plain login
 EOF
 
 # === Create mail user if missing ===
