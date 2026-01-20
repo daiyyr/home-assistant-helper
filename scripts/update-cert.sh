@@ -1,8 +1,5 @@
 #!/bin/sh
 
-# Exit on error
-set -e
-
 # Ensure a machine nickname is provided
 if [ -z "$1" ]; then
   echo "Usage: $0 <MACHINE_NICKNAME>"
@@ -34,4 +31,4 @@ if [ "$MACHINE_NICKNAME" == "home" ]; then
     fi
 fi
 
-# ha core restart
+ha core restart
