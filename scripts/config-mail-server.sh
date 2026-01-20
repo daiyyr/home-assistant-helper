@@ -45,27 +45,34 @@ postconf -e "smtpd_tls_loglevel = 1"
 
 # === Configure Dovecot ===
 cat >/etc/dovecot/dovecot.conf <<EOF
-# Dovecot main configuration
-dovecot_config_version = 2.4.1
-# Networking
-listen = *
-protocols = imap pop3
-# Authentication
-disable_plaintext_auth = yes
-auth_mechanisms = plain login
-# Mail storage
-mail_location = maildir:~/Maildir
-# SSL/TLS
-ssl = required
-ssl_cert = </etc/letsencrypt/live/$MAIL_DOMAIN/fullchain.pem
-ssl_key = </etc/letsencrypt/live/$MAIL_DOMAIN/privkey.pem
-ssl_min_protocol = TLSv1.2
-ssl_prefer_server_ciphers = yes
-# Privileges
-mail_privileged_group = mail
-# Logging (optional but recommended for debugging)
-log_path = /var/log/dovecot.log
-info_log_path = /var/log/dovecot-info.log
+# Start new configs with the latest Dovecot version numbers here:
+dovecot_config_version = 2.4.0
+dovecot_storage_version = 2.4.0
+
+# Enable wanted protocols:
+protocols {
+  imap = yes
+}
+
+mail_home = /home/$EMAIL_USER
+mail_driver = sdbox
+mail_path = ~/mail
+
+mail_uid = $EMAIL_USER
+mail_gid = $EMAIL_USER
+
+# By default first_valid_uid is 500. If your $EMAIL_USER user's UID is smaller,
+# you need to modify this:
+#first_valid_uid = uid-number-of-vmail-user
+
+namespace inbox {
+  inbox = yes
+  separator = /
+}
+
+# Authenticate as system users:
+passdb pam {
+}
 EOF
 
 # === Create mail user if missing ===
