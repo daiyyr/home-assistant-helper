@@ -45,13 +45,27 @@ postconf -e "smtpd_tls_loglevel = 1"
 
 # === Configure Dovecot ===
 cat >/etc/dovecot/dovecot.conf <<EOF
+# Dovecot main configuration
+dovecot_config_version = 2.4
+# Networking
+listen = *
+protocols = imap pop3
+# Authentication
 disable_plaintext_auth = yes
 auth_mechanisms = plain login
+# Mail storage
 mail_location = maildir:~/Maildir
+# SSL/TLS
 ssl = required
 ssl_cert = </etc/letsencrypt/live/$MAIL_DOMAIN/fullchain.pem
 ssl_key = </etc/letsencrypt/live/$MAIL_DOMAIN/privkey.pem
+ssl_min_protocol = TLSv1.2
+ssl_prefer_server_ciphers = yes
+# Privileges
 mail_privileged_group = mail
+# Logging (optional but recommended for debugging)
+log_path = /var/log/dovecot.log
+info_log_path = /var/log/dovecot-info.log
 EOF
 
 # === Create mail user if missing ===
