@@ -90,7 +90,7 @@ mkdir -p /home/$EMAIL_USER/Maildir
 chown -R $EMAIL_USER:$EMAIL_USER /home/$EMAIL_USER/Maildir
 
 # === Start Postfix (still OpenRC optional) ===
-if ! pgrep postfix >/dev/null 2>&1; then
+if ! pgrep -x master >/dev/null 2>&1; then
     /usr/sbin/postfix start
 fi
 
