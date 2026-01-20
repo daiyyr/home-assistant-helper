@@ -15,12 +15,17 @@ echo "=== Updating system ==="
 apk update && apk upgrade
 
 echo "=== Installing packages ==="
-apk add postfix dovecot openssl certbot shadow
+apk add --no-cache postfix dovecot openssl certbot shadow
 
-# === Obtain TLS certificate ===
-echo "=== Stopping mail services to get cert ==="
-rc-service postfix stop || true
-rc-service dovecot stop || true
+echo "=== Create /etc/dovecot dir if missing ==="
+mkdir -p /etc/dovecot
+
+# === Obtain TLS certificate if missing ===
+if [ ! -f "/etc/letsencrypt/live/$MAIL_DOMAIN/fullchain.pem" ]; then
+    echo "=== Stopping mail services to get cert ==="
+    rc-service postfix stop 2>/dev/null || true
+    rc-service dovecot stop 2>/dev/null || true
+fi
 
 # === Configure Postfix ===
 postconf -e "myhostname = $MAIL_DOMAIN"
@@ -41,40 +46,29 @@ postconf -e "smtpd_tls_loglevel = 1"
 # === Configure Dovecot ===
 cat >/etc/dovecot/dovecot.conf <<EOF
 disable_plaintext_auth = yes
-mail_privileged_group = mail
-EOF
-
-cat >/etc/dovecot/conf.d/10-mail.conf <<EOF
-mail_location = maildir:~/Maildir
-EOF
-
-cat >/etc/dovecot/conf.d/10-auth.conf <<EOF
 auth_mechanisms = plain login
-!include auth-system.conf.ext
-EOF
-
-cat >/etc/dovecot/conf.d/10-ssl.conf <<EOF
+mail_location = maildir:~/Maildir
 ssl = required
 ssl_cert = </etc/letsencrypt/live/$MAIL_DOMAIN/fullchain.pem
 ssl_key = </etc/letsencrypt/live/$MAIL_DOMAIN/privkey.pem
+mail_privileged_group = mail
 EOF
 
-# === Create email user ===
+# === Create mail user if missing ===
 if ! id "$EMAIL_USER" >/dev/null 2>&1; then
-  adduser -D "$EMAIL_USER"
+    adduser -D "$EMAIL_USER"
+    # Set password interactively
+    echo "=== Set password for $EMAIL_USER ==="
+    passwd "$EMAIL_USER"
 fi
 
-# Set password interactively
-echo "=== Set password for $EMAIL_USER ==="
-passwd "$EMAIL_USER"
-
-# Create Maildir
+# Create Maildir if missing
 mkdir -p /home/$EMAIL_USER/Maildir
 chown -R $EMAIL_USER:$EMAIL_USER /home/$EMAIL_USER/Maildir
 
-# === Start services ===
-rc-service postfix restart
-rc-service dovecot restart
+# === Restart services, ignore errors if already running ===
+rc-service postfix restart 2>/dev/null || true
+rc-service dovecot restart 2>/dev/null || true
 
 echo "======================================"
 echo " Mail server setup complete!"
