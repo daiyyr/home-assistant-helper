@@ -46,7 +46,7 @@ postconf -e "smtpd_tls_loglevel = 1"
 # === Configure Dovecot ===
 cat >/etc/dovecot/dovecot.conf <<EOF
 # Dovecot main configuration
-dovecot_config_version = 2.4
+dovecot_config_version = 2.4.1
 # Networking
 listen = *
 protocols = imap pop3
