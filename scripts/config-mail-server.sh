@@ -73,8 +73,8 @@ namespace inbox {
 passdb pam {
 }
 
-ssl_cert = </etc/letsencrypt/live/$MAIL_DOMAIN/fullchain.pem
-ssl_key = </etc/letsencrypt/live/$MAIL_DOMAIN/privkey.pem
+ssl_server_cert_file = /etc/letsencrypt/live/$MAIL_DOMAIN/fullchain.pem
+ssl_server_key_file = /etc/letsencrypt/live/$MAIL_DOMAIN/privkey.pem
 EOF
 
 # === Create mail user if missing ===
@@ -99,3 +99,6 @@ if ! pgrep dovecot >/dev/null 2>&1; then
     echo "Starting Dovecot in foreground ..."
     dovecot -F -c /etc/dovecot/dovecot.conf >> /var/log/dovecot.log 2>&1 &
 fi
+
+# test
+openssl s_client -connect localhost:993
