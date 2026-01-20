@@ -75,9 +75,7 @@ Resources:
                   Condition:
                     StringLike:
                       "route53:ChangeResourceRecordSetsNormalizedRecordNames":
-                        - "mail.*"
-                        - "_acme-challenge.mail.*"
-                        - !Sub "${MailHostedZoneId}"
+                        - "*"
                       "route53:ChangeResourceRecordSetsActions":
                         - CREATE
                         - UPSERT
