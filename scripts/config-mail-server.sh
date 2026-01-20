@@ -21,9 +21,11 @@ echo "=== Create /etc/dovecot dir if missing ==="
 mkdir -p /etc/dovecot
 
 # === Configure Postfix ===
-postconf -e "myhostname = $MAIL_DOMAIN"
+postconf -e "mynetworks_style = host"
+postconf -e "relay_domains ="
+# postconf -e "myhostname = $MAIL_DOMAIN"
 postconf -e "mydomain = $DOMAIN"
-postconf -e "myorigin = /etc/mailname"
+postconf -e "myorigin = $DOMAIN"
 postconf -e "inet_interfaces = all"
 postconf -e "inet_protocols = ipv4"
 postconf -e "home_mailbox = Maildir/"
