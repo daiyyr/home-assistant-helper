@@ -22,8 +22,8 @@ mkdir -p /etc/dovecot
 
 # === Configure Postfix ===
 postconf -e "mynetworks_style = host"
-postconf -e "relay_domains ="
-# postconf -e "myhostname = $MAIL_DOMAIN"
+postconf -e "relay_domains = $DOMAIN"
+postconf -e "myhostname = $MAIL_DOMAIN"
 postconf -e "mydomain = $DOMAIN"
 postconf -e "myorigin = $DOMAIN"
 postconf -e "inet_interfaces = all"
@@ -39,6 +39,22 @@ postconf -e "smtpd_tls_loglevel = 1"
 postconf -e "smtpd_sasl_auth_enable = yes"
 postconf -e "smtpd_sasl_type = dovecot"
 postconf -e "smtpd_sasl_path = private/auth"
+
+BLOCK_MARKER="## Gmail submission block"
+
+# Check if block already exists
+if ! grep -q "$BLOCK_MARKER" /etc/postfix/master.cf; then
+  echo "$BLOCK_MARKER" | sudo tee -a /etc/postfix/master.cf
+  sudo tee -a /etc/postfix/master.cf > /dev/null <<'EOF'
+submission inet n       -       n       -       -       smtpd
+  -o syslog_name=postfix/submission
+  -o smtpd_tls_security_level=encrypt
+  -o smtpd_sasl_auth_enable=yes
+  -o smtpd_recipient_restrictions=permit_sasl_authenticated,reject
+EOF
+fi
+
+
 # === Configure Dovecot ===
 cat >/etc/dovecot/dovecot.conf <<EOF
 # Start new configs with the latest Dovecot version numbers here:
