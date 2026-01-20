@@ -38,6 +38,9 @@ if [ ! -f "/config/ssl/fullchain.pem" ]; then
     chmod 644 /config/ssl/privkey.pem
 fi
 
+# Try to create mail certificate
+$MAIL_DOMAIN="mail.$DOMEAIN_NAME"
+
 
 # Clone the helper repo
 cd /opt

@@ -23,6 +23,9 @@ Parameters:
     Description: SLD, the domain name you registered
     Default: the-alchemist.link
 
+Conditions:
+  IsMainHomeMachine: !Equals [ !Ref MachineNickName, home ]
+
 Resources:
 
   HomeAssistantUser:
@@ -44,11 +47,13 @@ Resources:
                 Action:
                   - route53:GetHostedZone
                 Resource: !Sub arn:aws:route53:::hostedzone/${HostedZoneId}
-
-              - Effect: Allow
-                Action:
-                  - route53:GetHostedZone
-                Resource: !Sub arn:aws:route53:::hostedzone/${MailHostedZoneId}
+              - Fn::If:
+                - IsMainHomeMachine
+                - Effect: Allow
+                  Action:
+                    - route53:GetHostedZone
+                  Resource: !Sub arn:aws:route53:::hostedzone/${MailHostedZoneId}
+                - !Ref AWS::NoValue
 
               - Effect: Allow
                 Action: route53:ChangeResourceRecordSets
@@ -62,17 +67,20 @@ Resources:
                       - CREATE
                       - UPSERT
 
-              - Effect: Allow
-                Action: route53:ChangeResourceRecordSets
-                Resource: !Sub arn:aws:route53:::hostedzone/${MailHostedZoneId}
-                Condition:
-                  StringLike:
-                    "route53:ChangeResourceRecordSetsNormalizedRecordNames":
-                      - "mail.*"
-                      - "_acme-challenge.mail.*"
-                    "route53:ChangeResourceRecordSetsActions":
-                      - CREATE
-                      - UPSERT
+              - Fn::If:
+                - IsMainHomeMachine
+                - Effect: Allow
+                  Action: route53:ChangeResourceRecordSets
+                  Resource: !Sub arn:aws:route53:::hostedzone/${MailHostedZoneId}
+                  Condition:
+                    StringLike:
+                      "route53:ChangeResourceRecordSetsNormalizedRecordNames":
+                        - "mail.*"
+                        - "_acme-challenge.mail.*"
+                      "route53:ChangeResourceRecordSetsActions":
+                        - CREATE
+                        - UPSERT
+                - !Ref AWS::NoValue
 
               - Effect: Allow
                 Action:
