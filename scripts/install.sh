@@ -29,7 +29,7 @@ git config --global user.name "$MACHINE_NICKNAME"
 git config --global user.email "$MACHINE_NICKNAME@$DOMEAIN_NAME"
 
 
-# Create certificate
+# Create home assistant certificate
 if [ ! -f "/config/ssl/fullchain.pem" ]; then
     certbot certonly --dns-route53 -d $MACHINE_NICKNAME.$DOMEAIN_NAME --non-interactive --agree-tos --register-unsafely-without-email
     cp /etc/letsencrypt/live/$MACHINE_NICKNAME.$DOMEAIN_NAME/fullchain.pem /config/ssl/fullchain.pem
@@ -38,9 +38,15 @@ if [ ! -f "/config/ssl/fullchain.pem" ]; then
     chmod 644 /config/ssl/privkey.pem
 fi
 
-# Try to create mail certificate
-$MAIL_DOMAIN="mail.$DOMEAIN_NAME"
-
+# Create mail certificate
+if [ "$MACHINE_NICKNAME" == "home" ]; then
+    MAIL_DOMAIN=`aws route53 get-hosted-zone --id ${R53HostedZoneId_for_mail} --query "HostedZone.Name" --output text`
+    MAIL_DOMAIN=${MAIL_DOMAIN%.}
+    MAIL_DOMAIN_NAME=mail.$MAIL_DOMAIN
+    if [ ! -f "/etc/letsencrypt/live/mail.$MAIL_DOMAIN_NAME/fullchain.pem" ]; then
+        certbot certonly --dns-route53 -d mail.$MAIL_DOMAIN_NAME --non-interactive --agree-tos --register-unsafely-without-email
+    fi
+fi
 
 # Clone the helper repo
 cd /opt
