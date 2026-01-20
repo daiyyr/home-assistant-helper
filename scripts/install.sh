@@ -12,6 +12,7 @@ fi
 
 MACHINE_NICKNAME="$1"
 DOMEAIN_NAME="the-alchemist.link"
+R53HostedZoneId_for_mail="Z0418706D4R5AHFWGBQ9"
 
 # Install required packages. 
 # Depending on the OS, you may need to use the relevant package manager to install the AWS CLI. Home Assistant Operating System for Raspberry Pi is based on Alpine Linux, so we use apk here
@@ -102,4 +103,9 @@ fi
 # Start cron daemon
 if ! pgrep -x "crond" > /dev/null; then
     crond
+fi
+
+# Config and start mail server if this is the main home machine
+if [ "$MACHINE_NICKNAME" == "home" ]; then
+    /opt/home-assistant-helper/scripts/config-mail-server.sh
 fi
