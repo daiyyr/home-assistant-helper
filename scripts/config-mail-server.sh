@@ -108,6 +108,16 @@ service lmtp {
 }
 
 service auth {
+  unix_listener auth-userdb {
+    mode = 0600
+    user = dovecot
+  }
+
+  unix_listener auth-master {
+    mode = 0600
+    user = dovecot
+  }
+
   unix_listener /var/spool/postfix/private/auth {
     mode = 0660
     group = postfix
@@ -146,4 +156,7 @@ fi
 # test
 # openssl s_client -connect localhost:993
 
-doveadm pw -s PLAIN -u $EMAIL_USER@$DOMAIN
+# doveadm pw -s PLAIN -u $EMAIL_USER@$DOMAIN
+
+# chown postfix:postfix /var/spool/postfix/private
+# chmod 750 /var/spool/postfix/private
