@@ -15,7 +15,7 @@ echo "=== Updating system ==="
 apk update && apk upgrade
 
 echo "=== Installing packages ==="
-apk add postfix dovecot dovecot-pop3d dovecot-imapd openssl certbot shadow
+apk add postfix dovecot openssl certbot shadow
 
 # === Obtain TLS certificate ===
 echo "=== Stopping mail services to get cert ==="
