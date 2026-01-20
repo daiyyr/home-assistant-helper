@@ -39,6 +39,8 @@ postconf -e "smtpd_tls_loglevel = 1"
 postconf -e "smtpd_sasl_auth_enable = yes"
 postconf -e "smtpd_sasl_type = dovecot"
 postconf -e "smtpd_sasl_path = private/auth"
+postconf -e "virtual_transport = lmtp:unix:private/dovecot-lmtp"
+
 
 BLOCK_MARKER="## Gmail submission block"
 
@@ -50,6 +52,7 @@ submission inet n       -       n       -       -       smtpd
   -o syslog_name=postfix/submission
   -o smtpd_tls_security_level=encrypt
   -o smtpd_sasl_auth_enable=yes
+  -o smtpd_tls_auth_only=yes
   -o smtpd_recipient_restrictions=permit_sasl_authenticated,reject
 EOF
 fi
@@ -91,12 +94,21 @@ ssl_server_cert_file = /etc/letsencrypt/live/$MAIL_DOMAIN/fullchain.pem
 ssl_server_key_file = /etc/letsencrypt/live/$MAIL_DOMAIN/privkey.pem
 
 service lmtp {
-  unix_listener /var/spool/postfix/private/auth {
+  unix_listener /var/spool/postfix/private/dovecot-lmtp {
     mode = 0600
     group = postfix
     user = postfix
   }
 }
+
+service auth {
+  unix_listener /var/spool/postfix/private/auth {
+    mode = 0660
+    group = postfix
+    user = postfix
+  }
+}
+
 EOF
 
 # === Create mail user if missing ===
@@ -123,4 +135,6 @@ if ! pgrep dovecot >/dev/null 2>&1; then
 fi
 
 # test
-openssl s_client -connect localhost:993
+# openssl s_client -connect localhost:993
+
+doveadm pw -s PLAIN -u $EMAIL_USER@$DOMAIN
