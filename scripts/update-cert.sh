@@ -11,6 +11,7 @@ fi
 
 MACHINE_NICKNAME="$1"
 DOMEAIN_NAME="the-alchemist.link"
+R53HostedZoneId_for_mail="Z0418706D4R5AHFWGBQ9"
 
 certbot renew --quiet
 
