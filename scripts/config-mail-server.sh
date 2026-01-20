@@ -20,13 +20,6 @@ apk add --no-cache postfix dovecot openssl certbot shadow
 echo "=== Create /etc/dovecot dir if missing ==="
 mkdir -p /etc/dovecot
 
-# === Obtain TLS certificate if missing ===
-if [ ! -f "/etc/letsencrypt/live/$MAIL_DOMAIN/fullchain.pem" ]; then
-    echo "=== Stopping mail services to get cert ==="
-    rc-service postfix stop 2>/dev/null || true
-    rc-service dovecot stop 2>/dev/null || true
-fi
-
 # === Configure Postfix ===
 postconf -e "myhostname = $MAIL_DOMAIN"
 postconf -e "mydomain = $DOMAIN"
@@ -41,7 +34,9 @@ postconf -e "smtp_tls_security_level = may"
 postconf -e "smtpd_tls_auth_only = yes"
 postconf -e "smtpd_tls_protocols = !SSLv2,!SSLv3"
 postconf -e "smtpd_tls_loglevel = 1"
-
+postconf -e "smtpd_sasl_auth_enable = yes"
+postconf -e "smtpd_sasl_type = dovecot"
+postconf -e "smtpd_sasl_path = private/auth"
 # === Configure Dovecot ===
 cat >/etc/dovecot/dovecot.conf <<EOF
 # Start new configs with the latest Dovecot version numbers here:
@@ -75,6 +70,14 @@ passdb pam {
 
 ssl_server_cert_file = /etc/letsencrypt/live/$MAIL_DOMAIN/fullchain.pem
 ssl_server_key_file = /etc/letsencrypt/live/$MAIL_DOMAIN/privkey.pem
+
+service lmtp {
+  unix_listener /var/spool/postfix/private/auth {
+    mode = 0600
+    group = postfix
+    user = postfix
+  }
+}
 EOF
 
 # === Create mail user if missing ===
