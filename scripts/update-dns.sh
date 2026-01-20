@@ -28,6 +28,7 @@ if [ "$PUBLIC_IP" != "$PREVIOUS_IP" ]; then
         aws route53 change-resource-record-sets --hosted-zone-id ${R53HostedZoneId} --change-batch '{"Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"'"$URL"'","Type":"A","TTL":10,"ResourceRecords":[{"Value":"'"$PUBLIC_IP"'"}]}}]}'
         
         MAIL_DOMAIN=`aws route53 get-hosted-zone --id ${R53HostedZoneId_for_mail} --query "HostedZone.Name" --output text`
+        MAIL_DOMAIN=${MAIL_DOMAIN%.}
         MAIL_DOMAIN_NAME=mail.$MAIL_DOMAIN
         aws route53 change-resource-record-sets --hosted-zone-id ${R53HostedZoneId_for_mail} --change-batch '{"Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"'"$MAIL_DOMAIN_NAME"'","Type":"A","TTL":10,"ResourceRecords":[{"Value":"'"$PUBLIC_IP"'"}]}}]}'
     fi

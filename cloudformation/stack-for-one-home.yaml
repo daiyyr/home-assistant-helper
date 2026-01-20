@@ -14,7 +14,7 @@ Parameters:
     Type: String
     Description: Route 53 Hosted Zone ID
     Default: Z06958611JDYVCG41K93R
-  HostedZoneId2:
+  MailHostedZoneId:
     Type: String
     Description: Another Route 53 Hosted Zone ID
     Default: Z0418706D4R5AHFWGBQ9
@@ -48,7 +48,7 @@ Resources:
               - Effect: Allow
                 Action:
                   - route53:GetHostedZone
-                Resource: !Sub arn:aws:route53:::hostedzone/${HostedZoneId2}
+                Resource: !Sub arn:aws:route53:::hostedzone/${MailHostedZoneId}
 
               - Effect: Allow
                 Action: route53:ChangeResourceRecordSets
@@ -64,12 +64,12 @@ Resources:
 
               - Effect: Allow
                 Action: route53:ChangeResourceRecordSets
-                Resource: !Sub arn:aws:route53:::hostedzone/${HostedZoneId2}
+                Resource: !Sub arn:aws:route53:::hostedzone/${MailHostedZoneId}
                 Condition:
                   StringLike:
                     "route53:ChangeResourceRecordSetsNormalizedRecordNames":
-                      - !Sub "${MachineNickName}.${SecondLevelDomainName}"
-                      - !Sub "_acme-challenge.${MachineNickName}.${SecondLevelDomainName}"
+                      - !Sub "mail.${SecondLevelDomainName}"
+                      - !Sub "_acme-challenge.mail.${SecondLevelDomainName}"
                     "route53:ChangeResourceRecordSetsActions":
                       - CREATE
                       - UPSERT
