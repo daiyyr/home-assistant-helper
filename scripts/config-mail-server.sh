@@ -46,6 +46,7 @@ dovecot_storage_version = 2.4.0
 # Enable wanted protocols:
 protocols {
   imap = yes
+  lmtp = yes
 }
 
 mail_home = /home/$EMAIL_USER
