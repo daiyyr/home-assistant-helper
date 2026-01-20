@@ -68,8 +68,8 @@ Resources:
                 Condition:
                   StringLike:
                     "route53:ChangeResourceRecordSetsNormalizedRecordNames":
-                      - !Sub "mail.${SecondLevelDomainName}"
-                      - !Sub "_acme-challenge.mail.${SecondLevelDomainName}"
+                      - "mail.*"
+                      - "_acme-challenge.mail.*"
                     "route53:ChangeResourceRecordSetsActions":
                       - CREATE
                       - UPSERT
