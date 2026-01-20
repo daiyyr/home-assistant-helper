@@ -36,7 +36,6 @@ postconf -e "inet_protocols = ipv4"
 postconf -e "home_mailbox = Maildir/"
 postconf -e "smtpd_tls_cert_file = /etc/letsencrypt/live/$MAIL_DOMAIN/fullchain.pem"
 postconf -e "smtpd_tls_key_file = /etc/letsencrypt/live/$MAIL_DOMAIN/privkey.pem"
-postconf -e "smtpd_use_tls = yes"
 postconf -e "smtpd_tls_security_level = may"
 postconf -e "smtp_tls_security_level = may"
 postconf -e "smtpd_tls_auth_only = yes"
@@ -73,6 +72,9 @@ namespace inbox {
 # Authenticate as system users:
 passdb pam {
 }
+
+ssl_cert = </etc/letsencrypt/live/$MAIL_DOMAIN/fullchain.pem
+ssl_key = </etc/letsencrypt/live/$MAIL_DOMAIN/privkey.pem
 EOF
 
 # === Create mail user if missing ===
@@ -87,13 +89,13 @@ fi
 mkdir -p /home/$EMAIL_USER/Maildir
 chown -R $EMAIL_USER:$EMAIL_USER /home/$EMAIL_USER/Maildir
 
-# === Restart services, ignore errors if already running ===
-rc-service postfix restart 2>/dev/null || true
-rc-service dovecot restart 2>/dev/null || true
+# === Start Postfix (still OpenRC optional) ===
+if ! pgrep postfix >/dev/null 2>&1; then
+    /usr/sbin/postfix start
+fi
 
-echo "======================================"
-echo " Mail server setup complete!"
-echo " Email: $EMAIL_USER@$DOMAIN"
-echo " IMAP: $MAIL_DOMAIN : 993 (SSL)"
-echo " SMTP: $MAIL_DOMAIN : 587 (STARTTLS)"
-echo "======================================"
+# === Start Dovecot manually if not running ===
+if ! pgrep dovecot >/dev/null 2>&1; then
+    echo "Starting Dovecot in foreground ..."
+    dovecot -F -c /etc/dovecot/dovecot.conf >> /var/log/dovecot.log 2>&1 &
+fi
