@@ -77,6 +77,7 @@ Resources:
                       "route53:ChangeResourceRecordSetsNormalizedRecordNames":
                         - "mail.*"
                         - "_acme-challenge.mail.*"
+                        - "${MailHostedZoneId}"
                       "route53:ChangeResourceRecordSetsActions":
                         - CREATE
                         - UPSERT
