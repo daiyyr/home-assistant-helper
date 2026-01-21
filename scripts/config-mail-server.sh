@@ -40,6 +40,7 @@ postconf -e "smtpd_sasl_auth_enable = yes"
 postconf -e "smtpd_sasl_type = dovecot"
 postconf -e "smtpd_sasl_path = private/auth"
 postconf -e "virtual_transport = lmtp:unix:private/dovecot-lmtp"
+postconf -e "virtual_mailbox_domains = $DOMAIN"
 postconf -e "smtpd_relay_restrictions = permit_mynetworks, permit_sasl_authenticated, reject_unauth_destination"
 
 
