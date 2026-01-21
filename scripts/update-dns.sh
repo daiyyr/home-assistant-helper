@@ -27,13 +27,13 @@ if [ "$PUBLIC_IP" != "$PREVIOUS_IP" ]; then
         URL=${MACHINE_NICKNAME}.$DOMAIN_NAME
         aws route53 change-resource-record-sets --hosted-zone-id ${R53HostedZoneId} --change-batch '{"Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"'"$URL"'","Type":"A","TTL":300,"ResourceRecords":[{"Value":"'"$PUBLIC_IP"'"}]}}]}'
         
-        if [ "$MACHINE_NICKNAME" == "home" ]; then
-          MAIL_DOMAIN=`aws route53 get-hosted-zone --id ${R53HostedZoneId_for_mail} --query "HostedZone.Name" --output text`
-          # MAIL_DOMAIN=${MAIL_DOMAIN%.} # do not trim the dot here
-          MAIL_HOST=mail.$MAIL_DOMAIN
-          aws route53 change-resource-record-sets --hosted-zone-id ${R53HostedZoneId_for_mail} --change-batch '{"Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"'"$MAIL_HOST"'","Type":"A","TTL":300,"ResourceRecords":[{"Value":"'"$PUBLIC_IP"'"}]}}]}'
-          aws route53 change-resource-record-sets --hosted-zone-id ${R53HostedZoneId_for_mail} --change-batch '{"Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"'"$MAIL_DOMAIN"'","Type":"MX","TTL":300,"ResourceRecords":[{"Value":"'"10 $MAIL_HOST"'"}]}}]}'
-        fi
+        # if [ "$MACHINE_NICKNAME" == "home" ]; then
+        #   MAIL_DOMAIN=`aws route53 get-hosted-zone --id ${R53HostedZoneId_for_mail} --query "HostedZone.Name" --output text`
+        #   # MAIL_DOMAIN=${MAIL_DOMAIN%.} # do not trim the dot here
+        #   MAIL_HOST=mail.$MAIL_DOMAIN
+        #   aws route53 change-resource-record-sets --hosted-zone-id ${R53HostedZoneId_for_mail} --change-batch '{"Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"'"$MAIL_HOST"'","Type":"A","TTL":300,"ResourceRecords":[{"Value":"'"$PUBLIC_IP"'"}]}}]}'
+        #   aws route53 change-resource-record-sets --hosted-zone-id ${R53HostedZoneId_for_mail} --change-batch '{"Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"'"$MAIL_DOMAIN"'","Type":"MX","TTL":300,"ResourceRecords":[{"Value":"'"10 $MAIL_HOST"'"}]}}]}'
+        # fi
     fi
 
   # Save the new IP for future comparisons

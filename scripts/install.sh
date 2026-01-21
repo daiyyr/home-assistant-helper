@@ -40,14 +40,14 @@ if [ ! -f "/config/ssl/fullchain.pem" ]; then
 fi
 
 # Create mail certificate
-if [ "$MACHINE_NICKNAME" == "home" ]; then
-    MAIL_DOMAIN=`aws route53 get-hosted-zone --id ${R53HostedZoneId_for_mail} --query "HostedZone.Name" --output text`
-    MAIL_DOMAIN=${MAIL_DOMAIN%.}
-    MAIL_DOMAIN_NAME=mail.$MAIL_DOMAIN
-    if [ ! -f "/etc/letsencrypt/live/mail.$MAIL_DOMAIN_NAME/fullchain.pem" ]; then
-        certbot certonly --dns-route53 -d mail.$MAIL_DOMAIN_NAME --non-interactive --agree-tos --register-unsafely-without-email
-    fi
-fi
+# if [ "$MACHINE_NICKNAME" == "home" ]; then
+#     MAIL_DOMAIN=`aws route53 get-hosted-zone --id ${R53HostedZoneId_for_mail} --query "HostedZone.Name" --output text`
+#     MAIL_DOMAIN=${MAIL_DOMAIN%.}
+#     MAIL_DOMAIN_NAME=mail.$MAIL_DOMAIN
+#     if [ ! -f "/etc/letsencrypt/live/mail.$MAIL_DOMAIN_NAME/fullchain.pem" ]; then
+#         certbot certonly --dns-route53 -d mail.$MAIL_DOMAIN_NAME --non-interactive --agree-tos --register-unsafely-without-email
+#     fi
+# fi
 
 # Clone the helper repo
 cd /opt
@@ -106,6 +106,6 @@ if ! pgrep -x "crond" > /dev/null; then
 fi
 
 # Config and start mail server if this is the main home machine
-if [ "$MACHINE_NICKNAME" == "home" ]; then
-    /opt/home-assistant-helper/scripts/config-mail-server.sh
-fi
+# if [ "$MACHINE_NICKNAME" == "home" ]; then
+#     /opt/home-assistant-helper/scripts/config-mail-server.sh
+# fi

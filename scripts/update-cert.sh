@@ -22,13 +22,13 @@ chmod 644 /config/ssl/fullchain.pem
 chmod 644 /config/ssl/privkey.pem
 
 # Update mail certificate if this is the main home machine
-if [ "$MACHINE_NICKNAME" == "home" ]; then
-    MAIL_DOMAIN=`aws route53 get-hosted-zone --id ${R53HostedZoneId_for_mail} --query "HostedZone.Name" --output text`
-    MAIL_DOMAIN=${MAIL_DOMAIN%.}
-    MAIL_DOMAIN_NAME=mail.$MAIL_DOMAIN
-    if [ ! -f "/etc/letsencrypt/live/$MAIL_DOMAIN_NAME/fullchain.pem" ]; then
-        certbot certonly --dns-route53 -d $MAIL_DOMAIN_NAME --non-interactive --agree-tos --register-unsafely-without-email
-    fi
-fi
+# if [ "$MACHINE_NICKNAME" == "home" ]; then
+#     MAIL_DOMAIN=`aws route53 get-hosted-zone --id ${R53HostedZoneId_for_mail} --query "HostedZone.Name" --output text`
+#     MAIL_DOMAIN=${MAIL_DOMAIN%.}
+#     MAIL_DOMAIN_NAME=mail.$MAIL_DOMAIN
+#     if [ ! -f "/etc/letsencrypt/live/$MAIL_DOMAIN_NAME/fullchain.pem" ]; then
+#         certbot certonly --dns-route53 -d $MAIL_DOMAIN_NAME --non-interactive --agree-tos --register-unsafely-without-email
+#     fi
+# fi
 
 ha core restart
