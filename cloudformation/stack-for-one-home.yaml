@@ -47,13 +47,14 @@ Resources:
                 Action:
                   - route53:GetHostedZone
                 Resource: !Sub arn:aws:route53:::hostedzone/${HostedZoneId}
-              - Fn::If:
-                - IsMainHomeMachine
-                - Effect: Allow
-                  Action:
-                    - route53:GetHostedZone
-                  Resource: !Sub arn:aws:route53:::hostedzone/${MailHostedZoneId}
-                - !Ref AWS::NoValue
+
+              # - Fn::If:
+              #   - IsMainHomeMachine
+              #   - Effect: Allow
+              #     Action:
+              #       - route53:GetHostedZone
+              #     Resource: !Sub arn:aws:route53:::hostedzone/${MailHostedZoneId}
+              #   - !Ref AWS::NoValue
 
               - Effect: Allow
                 Action: route53:ChangeResourceRecordSets
@@ -67,19 +68,19 @@ Resources:
                       - CREATE
                       - UPSERT
 
-              - Fn::If:
-                - IsMainHomeMachine
-                - Effect: Allow
-                  Action: route53:ChangeResourceRecordSets
-                  Resource: !Sub arn:aws:route53:::hostedzone/${MailHostedZoneId}
-                  Condition:
-                    StringLike:
-                      "route53:ChangeResourceRecordSetsNormalizedRecordNames":
-                        - "*"
-                      "route53:ChangeResourceRecordSetsActions":
-                        - CREATE
-                        - UPSERT
-                - !Ref AWS::NoValue
+              # - Fn::If:
+              #   - IsMainHomeMachine
+              #   - Effect: Allow
+              #     Action: route53:ChangeResourceRecordSets
+              #     Resource: !Sub arn:aws:route53:::hostedzone/${MailHostedZoneId}
+              #     Condition:
+              #       StringLike:
+              #         "route53:ChangeResourceRecordSetsNormalizedRecordNames":
+              #           - "*"
+              #         "route53:ChangeResourceRecordSetsActions":
+              #           - CREATE
+              #           - UPSERT
+              #   - !Ref AWS::NoValue
 
               - Effect: Allow
                 Action:
