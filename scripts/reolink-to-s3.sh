@@ -1,7 +1,7 @@
 #!/bin/bash
 
 MACHINE_NICKNAME=$(cat /opt/machine_nickname.txt)
-WATCH_DIRS=("/media/reolink" "/media/reolink_front" "/media/reolink_sideway" "/media/reolink_gardenside" "/media/reolink_roberts_front" "/media/reolink_roberts_garden")
+WATCH_DIRS=("/media/reolink" "/media/reolink_front" "/media/reolink_sideway" "/media/reolink_gardenside" "/media/reolink_roberts_front" "/media/reolink_roberts_garden" "/media/reolink_navi_front")
 BUCKET="s3://the-alchemist-home-assistant"
 
 # wait until file size is stable and > 0 (max ~60s)

@@ -63,6 +63,7 @@ mkdir -p /media/reolink_sideway
 mkdir -p /media/reolink_gardenside
 mkdir -p /media/reolink_roberts_front
 mkdir -p /media/reolink_roberts_garden
+mkdir -p /media/reolink_navi_front
 
 # start reolink-to-s3.sh
 TARGET="/opt/home-assistant-helper/scripts/reolink-to-s3.sh"
