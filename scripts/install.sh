@@ -60,6 +60,7 @@ mkdir -p /root/.cache
 mkdir -p /media/reolink
 mkdir -p /media/reolink_front
 mkdir -p /media/reolink_sideway
+mkdir -p /media/reolink_gate
 mkdir -p /media/reolink_gardenside
 mkdir -p /media/reolink_roberts_front
 mkdir -p /media/reolink_roberts_garden
